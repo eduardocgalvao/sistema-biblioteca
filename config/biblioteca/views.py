@@ -1,20 +1,25 @@
+"""Views para autenticação de usuários."""
+
 from django.shortcuts import render
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 from .models import tbl_usuario
 
-# Create your views here.
+
 def login_view(request):
-    login_form = AuthenticationForm()
+    """
+    Processa login do usuário através de email.
     
+    GET: Retorna formulário de login vazio.
+    POST: Autentica usuário e armazena dados na sessão.
+    """
     if request.method == 'POST':
         email = request.POST.get("email")
         
-        # Autentica usando o backend customizado
+        # Autentica usando o backend customizado (TblUsuarioBackend)
         usuario = authenticate(request, email=email)
         
         if usuario is not None:
-            # Armazenar usuário na sessão sem usar login() 
+            # Armazena dados do usuário na sessão
             request.session['usuario_id'] = usuario.id_usuario
             request.session['usuario_nome'] = usuario.nome
             request.session['usuario_email'] = usuario.email
@@ -22,7 +27,8 @@ def login_view(request):
         else:
             print("Usuário não encontrado ou credenciais inválidas")
     
-    return render(request, 'login.html', {'form': login_form})
+    return render(request, 'login.html')
+
 
 
 
