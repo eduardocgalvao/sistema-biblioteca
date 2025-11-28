@@ -48,6 +48,7 @@ class tbl_livro_categoria(models.Model):
 class tbl_usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=255)
+    sobrenome = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     
 class tbl_motivo_remocao(models.Model):
