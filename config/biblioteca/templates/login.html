@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - BookStack</title>
+
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'biblioteca/css/login.css' %}" />
+  </head>
+
+  <body>
+    <main>
+      <div class="box-login">
+        <h1>Inicie sua sessão</h1>
+
+        <div class="box-login-subtitle">
+          <h2>
+            Bem-vindo ao BookStack! Por favor, insira suas informações para
+            continuar.
+          </h2>
+
+          <form method="post">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Digite seu Nome" />
+            <input
+              type="text"
+              name="surname"
+              placeholder="Digite seu Sobrenome"
+            />
+            <input type="email" name="email" placeholder="Digite seu E-mail" />
+
+            <button type="submit">Iniciar minha Biblioteca</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
