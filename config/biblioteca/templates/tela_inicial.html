@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catálogo de Livros - BookStack</title>
+
+    <link rel="stylesheet" href="{% static 'css/tela_inicial.css' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <!-- MENU LATERAL -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <img src="{% static 'img/logo.png' %}" alt="Logo" />
+      </div>
+
+      <nav class="menu">
+        <a href="#"><i>📚</i> Todos os Livros</a>
+        <a href="#"><i>➕</i> Adicionar Livros</a>
+        <a href="#"><i>🏢</i> Editoras</a>
+        <a href="#"><i>🖋️</i> Autores</a>
+        <a href="#"><i>📦</i> Categorias</a>
+      </nav>
+
+      <div class="logout">
+        <a href="#"><i>🚪</i> Encerrar Sessão</a>
+      </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="content">
+      <div class="search-box">
+        <input type="text" placeholder="Procurar por nome do livro..." />
+      </div>
+
+      <h1 class="title">Catálogo de Livros</h1>
+
+      <section class="books-grid">
+        <!-- CARD DO LIVRO (repita usando Django ou backend) -->
+        <div class="book-card">
+          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
+          <p>Harry Potter and The Cursed Child</p>
+        </div>
+
+        <div class="book-card">
+          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
+          <p>Harry Potter and The Cursed Child</p>
+        </div>
+
+        <div class="book-card">
+          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
+          <p>Harry Potter and The Cursed Child</p>
+        </div>
+
+        <div class="book-card">
+          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
+          <p>Harry Potter and The Cursed Child</p>
+        </div>
+
+        <div class="book-card">
+          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
+          <p>Harry Potter and The Cursed Child</p>
+        </div>
+
+        <div class="book-card">
+          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
+          <p>Harry Potter and The Cursed Child</p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

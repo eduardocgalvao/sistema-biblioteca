@@ -1,0 +1,106 @@
+/* Importa a fonte 'Lexend' do Google Fonts com múltiplos pesos */
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Lexend', sans-serif;
+}
+
+body {
+    display: flex;
+    background: #fafafa;
+}
+
+/* ==== SIDEBAR ==== */
+
+.sidebar {
+    width: 220px;
+    background: #fff;
+    height: 100vh;
+    padding: 30px 20px;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo-area img {
+    width: 120px;
+    margin-bottom: 40px;
+}
+
+.menu a,
+.logout a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    font-size: 15px;
+    color: #333;
+    text-decoration: none;
+}
+
+.menu a:hover,
+.logout a:hover {
+    color: #1e88e5;
+}
+
+/* ==== CONTEÚDO ==== */
+
+.content {
+    flex: 1;
+    padding: 40px 60px;
+}
+
+/* Barra de Pesquisa */
+.search-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.search-box input {
+    width: 70%;
+    background: #fff;
+    border: none;
+    outline: none;
+    padding: 12px 16px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Título */
+.title {
+    font-size: 32px;
+    margin-top: 40px;
+    margin-bottom: 30px;
+    color: #222;
+}
+
+/* ==== GRID DOS LIVROS ==== */
+
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 40px 30px;
+    padding-bottom: 40px;
+}
+
+.book-card {
+    text-align: center;
+}
+
+.book-card img {
+    width: 150px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.book-card p {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #444;
+}
