@@ -102,9 +102,26 @@ def adicionar_livro(request):
     
     return render(request, 'adicionar_livro.html', {'form': form})
 
+def adicionar_autor(request):
+    """
+    View para adicionar um novo autor.
+    
+    GET: Exibe o formulário de criação de autor.
+    POST: Processa o formulário e cria o autor no banco de dados.
+    """
+    if request.method == 'POST':
+        form = AutorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('tela_inicial')
+    else:
+        form = AutorForm()
+    
+    return render(request, 'adicionar_autor.html', {'form': form})
+
 # CRIAR LIVRO ----------------------------------------------------------
 class LivroCreateView(View):
-    template_name = "biblioteca/livro_form.html"
+    template_name = "adicionar_livro.html"
 
     def get(self, request):
         form = LivroCreateForm()

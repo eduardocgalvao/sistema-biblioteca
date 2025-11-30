@@ -1,0 +1,68 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adicionar Autor</title>
+    <link rel="stylesheet" href="{% static 'css/adicionar_autor.css' %}" />
+  </head>
+
+  <div class="pagina">
+    <div class="cabecalho-livro">
+        <img src="/static/img/logo.png" class="logo-site">
+        <h1>Adicione um Novo Livro</h1>
+    </div>
+
+    <div class="card-form">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="linha-inputs">
+                <div class="campo">
+                    <label>Nome:</label>
+                    <input type="text" name="nome">
+                </div>
+
+                <div class="campo">
+                    <label>Sobrenome:</label>
+                    <input type="text" name="sobrenome">
+                </div>
+            </div>
+
+            <div class="btn-area">
+                <button type="submit" class="btn-salvar">
+                    Adicionar Autor
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+    <!-- POP-UP -->
+    <div id="popup" class="popup hidden">
+      <div class="popup-content">
+        <button class="popup-close" onclick="fecharPopup()">X</button>
+        <h2>Autor Salvo <span class="check">✔️</span></h2>
+        <p>Id: <span id="popup-id"></span></p>
+        <p>Nome: <span id="popup-nome"></span></p>
+        <p>Sobrenome: <span id="popup-sobrenome"></span></p>
+      </div>
+    </div>
+
+    <script>
+      function abrirPopup(id, nome, sobrenome) {
+        document.getElementById("popup-id").innerText = id;
+        document.getElementById("popup-nome").innerText = nome;
+        document.getElementById("popup-sobrenome").innerText = sobrenome;
+        document.getElementById("popup").classList.remove("hidden");
+      }
+
+      function fecharPopup() {
+        document.getElementById("popup").classList.add("hidden");
+      }
+    </script>
+  </body>
+</html>
