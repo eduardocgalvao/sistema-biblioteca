@@ -1,0 +1,96 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adicionar Livro</title>
+    <link rel="stylesheet" href="{% static 'css/adicionar_livro.css' %}" />
+  </head>
+
+  <body>
+    <header class="top-header">
+      <a href="/inicial/#" class="back-btn">←</a>
+      <img
+        src="{% static 'img/logo.png' %}"
+        class="logo"
+        alt="BookStack Logo"
+      />
+      <h1 class="titulo">Adicione um Novo Livro</h1>
+    </header>
+
+    <div class="container">
+      <form class="form">
+        <div class="form-group">
+          <label>Título:</label>
+          <input type="text" name="titulo" />
+        </div>
+
+        <div class="form-group">
+          <label>Editora:</label>
+          <select name="editora">
+            <option>Selecione...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>ISBN:</label>
+          <input type="text" name="isbn" />
+        </div>
+
+        <div class="form-group">
+          <label>Status:</label>
+          <select name="status">
+            <option>Selecione...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Ano de publicação:</label>
+          <input type="number" name="ano" />
+        </div>
+
+        <div class="form-group">
+          <label>Autores:</label>
+          <select name="autores">
+            <option>Selecione...</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label>Categorias:</label>
+          <select name="categorias">
+            <option>Selecione...</option>
+          </select>
+        </div>
+
+        <div class="btn-area">
+          <button type="submit" class="btn-add">Adicionar Livro</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- POP-UP -->
+    <div id="popup" class="popup hidden">
+      <div class="popup-content">
+        <button class="popup-close" onclick="fecharPopup()">X</button>
+        <h2>Livro Salvo <span class="check">✔️</span></h2>
+        <p>Id: <span id="popup-id"></span></p>
+        <p>Nome: <span id="popup-nome"></span></p>
+      </div>
+    </div>
+
+    <script>
+      function abrirPopup(id, nome) {
+        document.getElementById("popup-id").innerText = id;
+        document.getElementById("popup-nome").innerText = nome;
+        document.getElementById("popup").classList.remove("hidden");
+      }
+
+      function fecharPopup() {
+        document.getElementById("popup").classList.add("hidden");
+      }
+    </script>
+  </body>
+</html>
