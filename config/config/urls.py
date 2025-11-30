@@ -7,7 +7,7 @@ from biblioteca.views import login_view, tela_inicial, adicionar_livro
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', login_view, name='login'),
+    path('login/', login_view, name='login'),
     path('inicial/', tela_inicial, name='tela_inicial'),
     path('adicionarLivro/', adicionar_livro, name='adicionar_livro'),
 ]
