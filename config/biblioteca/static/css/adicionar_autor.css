@@ -7,6 +7,16 @@ body {
     margin: 0;
 }
 
+.back-btn {
+    position: absolute;
+    top: 25px;
+    left: 30px;
+    font-size: 26px;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
+
 .pagina {
     display: flex;
     flex-direction: column;
