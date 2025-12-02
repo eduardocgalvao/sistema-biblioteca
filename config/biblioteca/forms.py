@@ -11,43 +11,19 @@ from .models import (
     tbl_livro
 )
 # Formulário para criação de um novo livro
-class LivroCreateForm(forms.Form):
-    isbn = forms.CharField(
-        max_length=20,
-        widget=forms.TextInput(attrs={'class': 'input-field'})
-    )
-
-    titulo = forms.CharField(
-        max_length=255,
-        widget=forms.TextInput(attrs={'class': 'input-field'})
-    )
-
-    ano_publicacao = forms.IntegerField(
-        widget=forms.NumberInput(attrs={'class': 'input-field'})
-    )
-
-    editora = forms.ModelChoiceField(
-        queryset=tbl_editora.objects.all(),
-        widget=forms.Select(attrs={'class': 'single-select'})
-    )
-
-    status = forms.ModelChoiceField(
-        queryset=tbl_status_livro.objects.all(),
-        widget=forms.Select(attrs={'class': 'single-select'})
-    )
-
-    autores = forms.ModelMultipleChoiceField(
-        queryset=tbl_autor.objects.all(),
-        widget=Select2MultipleWidget(attrs={'class': 'multi-select'}),
-        required=False
-    )
-
-    categorias = forms.ModelMultipleChoiceField(
-        queryset=tbl_categoria.objects.all(),
-        widget=Select2MultipleWidget(attrs={'class': 'multi-select'}),
-        required=False
-    )
-
+class LivroCreateForm(forms.ModelForm):
+    class Meta:
+        model = tbl_livro
+        fields = "__all__"
+        widgets = {
+            "isbn": forms.TextInput(attrs={"class": "input-field"}),
+            "titulo": forms.TextInput(attrs={"class": "input-field"}),
+            "ano_publicacao": forms.NumberInput(attrs={"class": "input-field"}),
+            "editora": forms.Select(attrs={"class": "single-select"}),
+            "status": forms.Select(attrs={"class": "single-select"}),
+            "autores": Select2MultipleWidget(attrs={"class": "multi-select"}),
+            "categorias": Select2MultipleWidget(attrs={"class": "multi-select"}),
+        }
 
 # Formulário autor
 class AutorForm(forms.ModelForm):
