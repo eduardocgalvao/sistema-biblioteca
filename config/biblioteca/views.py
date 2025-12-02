@@ -165,43 +165,46 @@ def adicionar_categoria(request):
 
 # CRIAR LIVRO ----------------------------------------------------------
 class LivroCreateView(View):
-   
+    template_name = "adicionar_livro.html"
 
     def get(self, request):
         form = LivroCreateForm()
-        return render(request, self.template_name, {'form': form})
-    
+        editoras = tbl_editora.objects.all()
+        return render(request, self.template_name, {'form': form, 'editoras' : editoras})
+
     def post(self, request):
         form = LivroCreateForm(request.POST)
+        editoras = tbl_editora.objects.all()
 
-        # 1) Processa o formulário de criação de livro
-        if form.is_valid():
-            livro = tbl_livro.objects.create(
-                isbn=form.cleaned_data['isbn'],
-                titulo=form.cleaned_data['titulo'],
-                ano_publicacao=form.cleaned_data['ano_publicacao'],
-                editora=form.cleaned_data['editora'],
-                status=form.cleaned_data['status']
-            )
+        if not form.is_valid():
+            # Se o formulário estiver errado, volta pra página sem tentar salvar
+            return render(request, self.template_name, {'form': form, 'editoras' : editoras})
+
+        # 1) Cria o livro
+        livro = tbl_livro.objects.create(
+            isbn=form.cleaned_data['isbn'],
+            titulo=form.cleaned_data['titulo'],
+            ano_publicacao=form.cleaned_data['ano_publicacao'],
+            editora=form.cleaned_data['editora'],
+            status=form.cleaned_data['status']
+        )
 
         # 2) Salvar autores na tabela through
         for autor in form.cleaned_data["autores"]:
             tbl_livro_autor.objects.create(
-            livro=livro, 
-            autor=autor
-        )
+                livro=livro, 
+                autor=autor
+            )
+
         # 3) Salvar categorias na tabela through
         for categoria in form.cleaned_data["categorias"]:
             tbl_livro_categoria.objects.create(
                 livro=livro,
                 categoria=categoria
             )
-        form.save()
-        return redirect("livro_list")  # Redireciona para a lista de livros após criação
-        return render(request, self.template_name,{'form': form})
-    
-#CRIAR AUTOR ----------------------------------------------------------
 
+        return redirect("livro_list")
+    
 class AutorCreateView(View):
     template_name = "adicionar_autor.html"
     
@@ -215,7 +218,6 @@ class AutorCreateView(View):
             form.save()
             return redirect("autor_list")  # Redireciona para a lista de autores após criação
         return render(request, self.template_name, {'form': form})
-
 # LISTAR AUTORES ------------------------------------------------------
 
 class AutorListView(View):

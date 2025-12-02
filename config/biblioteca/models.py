@@ -10,6 +10,9 @@ class tbl_editora(models.Model):
     endereco = models.CharField(max_length=200)
     cidade = models.CharField(max_length=200)
 
+    def __str__(self):
+        return self.nome
+
 
 class tbl_autor(models.Model):
     """Armazena dados dos autores de livros."""
@@ -17,17 +20,25 @@ class tbl_autor(models.Model):
     nome = models.CharField(max_length=255)
     sobrenome = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.nome
+
 
 class tbl_categoria(models.Model):
     """Define as categorias/gêneros de livros."""
     id_categoria = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.nome
 
 class tbl_status_livro(models.Model):
     """Define os possíveis status de um livro (ativo, inativo, removido, etc)."""
     id_status = models.AutoField(primary_key=True)
     descricao = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.descricao
 
 
 class tbl_livro(models.Model):

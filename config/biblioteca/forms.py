@@ -5,24 +5,33 @@ from .models import (
     tbl_categoria, 
     tbl_status_livro,
     tbl_usuario,
-    tbl_motivo_remocao
+    tbl_motivo_remocao,
+    tbl_livro
 )
 # Formulário para criação de um novo livro
 class LivroCreateForm(forms.Form):
     isbn = forms.CharField(max_length=20)
     titulo = forms.CharField(max_length=255)
     ano_publicacao = forms.IntegerField()
-    editora = forms.ModelChoiceField(queryset=tbl_editora.objects.all())
-    status = forms.ModelChoiceField(queryset=tbl_status_livro.objects.all())
-    autores = forms.ModelMultipleChoiceField(
-    queryset=tbl_autor.objects.all(),
-    required=False
-)
 
-categorias = forms.ModelMultipleChoiceField(
-    queryset=tbl_categoria.objects.all(),
-    required=False
-)
+    editora = forms.ModelChoiceField(
+        queryset=tbl_editora.objects.all()
+    )
+
+    status = forms.ModelChoiceField(
+        queryset=tbl_status_livro.objects.all()
+    )
+
+    autores = forms.ModelMultipleChoiceField(
+        queryset=tbl_autor.objects.all(),
+        required=False
+    )
+
+    categorias = forms.ModelMultipleChoiceField(
+        queryset=tbl_categoria.objects.all(),
+        required=False
+    )
+
 
 # Formulário autor
 class AutorForm(forms.ModelForm):
@@ -40,7 +49,7 @@ class CategoriaForm(forms.ModelForm):
 class EditoraForm(forms.ModelForm):
     class Meta:
         model = tbl_editora
-        fields = ['nome']
+        fields = ['nome', 'cidade', 'endereco']
 
 # Formulário Status do Livro
 class StatusLivroForm(forms.ModelForm):
