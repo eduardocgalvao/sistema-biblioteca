@@ -1,11 +1,10 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Todos os Livros - BookStack</title>
-
     <link rel="stylesheet" href="{% static 'css/tela_todos_os_livros.css' %}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,208 +12,170 @@
       href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap"
       rel="stylesheet"
     />
-  </head>
-  <body>
+</head>
+<body>
     <div class="livros-container">
-      <div class="top-bar">
-        <a href="{% url 'tela_inicial' %}" class="voltar">←</a>
-
-        <div class="search-box">
-          <input type="text" placeholder="Procurar por nome do livro..." />
+        <div class="top-bar">
+            <a href="{% url 'tela_inicial' %}" class="voltar">←</a>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Procurar por nome do livro..." />
+            </div>
+            <img src="{% static 'img/logo.png' %}" class="logo-bookstack" />
         </div>
 
-        <img src="/static/img/logo.png" class="logo-bookstack" />
-      </div>
+        <div class="card-tabela">
+            <table class="tabela-livros">
+                <thead>
+                    <tr>
+                        <th>Ações</th>
+                        <th>Título</th>
+                        <th>Ano Publicação</th>
+                        <th>Editora</th>
+                        <th>Status</th>
+                        <th>Autores</th>
+                        <th>Categorias</th>
+                        <th>Data de Criação</th>
+                        <th>Data de Atualização</th>
+                    </tr>
+                </thead>
 
-      <div class="card-tabela">
-        <table class="tabela-livros">
-          <thead>
-            <tr>
-              <th>Ações</th>
-              <th>Título</th>
-              <th>Ano Publicação</th>
-              <th>Editora</th>
-              <th>Status</th>
-              <th>Autores</th>
-              <th>Categoria</th>
-              <th>Data de Criação</th>
-              <th>Data de Atualização</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td class="acoes-cell">
-                <span class="edit-icon" data-id="1">✏️</span>
-                <span class="delete-icon" data-id="1">🗑️</span>
-              </td>
-              <td>Dom Casmurro</td>
-              <td>1899</td>
-              <td>Bloomsbury Publishing / Rocco Presença</td>
-              <td>Ativo</td>
-              <td>Machado de Assis</td>
-              <td>Romance</td>
-              <td>16/02/2022</td>
-              <td>17/02/2022</td>
-            </tr>
-
-            <tr>
-              <td class="acoes-cell">
-                <span class="edit-icon" data-id="2">✏️</span>
-                <span class="delete-icon" data-id="2">🗑️</span>
-              </td>
-              <td>Harry Potter and The Cursed Child</td>
-              <td>2016</td>
-              <td>Editora Carambaia</td>
-              <td>Ativo</td>
-              <td>J. K. Rowling</td>
-              <td>Fantasia</td>
-              <td>17/12/2024</td>
-              <td>13/09/2025</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                <tbody>
+                    {% for item in livros_com_relacionados %}
+                    {% with livro=item.livro autores=item.autores categorias=item.categorias %}
+                    <tr data-id="{{ livro.id_livro }}">  <!-- CORREÇÃO: id_livro -->
+                        <td class="acoes-cell">
+                            <span class="edit-icon" data-id="{{ livro.id_livro }}">✏️</span>
+                            <span class="delete-icon" data-id="{{ livro.id_livro }}">🗑️</span>
+                        </td>
+                        <td>{{ livro.titulo }}</td>
+                        <td>{{ livro.ano_publicacao|default:"-" }}</td>
+                        <td>{{ livro.editora.nome|default:"-" }}</td>
+                        <td>
+                            <span class="status-badge status-{{ livro.status|lower }}">
+                                {% if livro.status == 'ativo' %}Ativo
+                                {% elif livro.status == 'inativo' %}Inativo
+                                {% elif livro.status == 'emprestado' %}Emprestado
+                                {% else %}{{ livro.status|title }}
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% for autor in autores %}
+                                {{ autor.nome }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                -
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for categoria in categorias %}
+                                {{ categoria.nome }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                -
+                            {% endfor %}
+                        </td>
+                        <td>{{ livro.data_criacao|date:"d/m/Y"|default:"-" }}</td>
+                        <td>{{ livro.data_atualizacao|date:"d/m/Y"|default:"-" }}</td>
+                    </tr>
+                    {% endwith %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" style="text-align: center;">Nenhum livro cadastrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Modal de edição -->
     <div id="edit-modal" class="modal hidden">
-      <div class="modal-content">
-        <span class="close-modal">×</span>
+        <div class="modal-content">
+            <span class="close-modal">×</span>
+            <h3>Editar Livro</h3>
+            
+            <form id="edit-form">
+                {% csrf_token %}
+                <input type="hidden" id="edit-id" name="livro_id">
+                
+                <div class="form-grid">
+                    <div class="campo">
+                        <label>Título:</label>
+                        <input type="text" id="edit-titulo" name="titulo" required />
+                    </div>
 
-        <div class="form-grid">
-          <div class="campo">
-            <label>Título:</label>
-            <input type="text" id="edit-titulo" />
-          </div>
+                    <div class="campo">
+                        <label>Editora:</label>
+                        <input type="text" id="edit-editora" name="editora" />
+                    </div>
 
-          <div class="campo">
-            <label>Editora:</label>
-            <input type="text" id="edit-editora" />
-          </div>
+                    <div class="campo">
+                        <label>Autores:</label>
+                        <input type="text" id="edit-autores" name="autores" />
+                    </div>
 
-          <div class="campo">
-            <label>Autores:</label>
-            <input type="text" id="edit-autores" />
-          </div>
+                    <div class="campo">
+                        <label>Ano Publicação:</label>
+                        <input type="number" id="edit-ano" name="ano_publicacao" />
+                    </div>
 
-          <div class="campo">
-            <label>Ano Publicação:</label>
-            <input type="text" id="edit-ano" />
-          </div>
+                    <div class="campo">
+                        <label>Categoria:</label>
+                        <select id="edit-categoria" name="categoria_id">
+                            <option value="">Selecione...</option>
+                            {% for cat in categorias %}
+                            <option value="{{ cat.id_categoria }}">{{ cat.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-          <div class="campo">
-            <label>Endereço:</label>
-            <input type="text" id="edit-endereco" />
-          </div>
+                    <div class="campo">
+                        <label>Status:</label>
+                        <select id="edit-status" name="status">
+                            <option value="ativo">Ativo</option>
+                            <option value="inativo">Inativo</option>
+                            <option value="emprestado">Emprestado</option>
+                        </select>
+                    </div>
+                </div>
 
-          <div class="campo">
-            <label>Categoria:</label>
-            <input type="text" id="edit-categoria" />
-          </div>
-
-          <div class="campo">
-            <label>Status:</label>
-            <input type="text" id="edit-status" />
-          </div>
-
-          <div class="campo">
-            <label>Cidade:</label>
-            <input type="text" id="edit-cidade" />
-          </div>
+                <div class="btn-area">
+                    <button type="button" class="btn-cancelar">Cancelar</button>
+                    <button type="submit" class="btn-salvar">Salvar Alteração</button>
+                </div>
+            </form>
         </div>
-
-        <div class="btn-area">
-          <button class="btn-salvar">Salvar Alteração</button>
-        </div>
-      </div>
     </div>
 
     <!-- Modal de confirmação para excluir -->
     <div id="delete-modal" class="modal hidden">
-      <div class="modal-content delete-modal">
-        <span class="close-modal">×</span>
-        <h3>Confirmar Exclusão</h3>
-        <p>Tem certeza que deseja excluir este livro?</p>
-        <p id="delete-book-title" class="book-title"></p>
-        <div class="modal-buttons">
-          <button class="btn-cancelar">Cancelar</button>
-          <button class="btn-confirmar-exclusao">Excluir</button>
+        <div class="modal-content delete-modal">
+            <span class="close-modal">×</span>
+            <h3>Confirmar Exclusão</h3>
+            <p>Tem certeza que deseja excluir este livro?</p>
+            <p id="delete-book-title" class="book-title"></p>
+            <div class="modal-buttons">
+                <button class="btn-cancelar">Cancelar</button>
+                <button class="btn-confirmar-exclusao">Excluir</button>
+            </div>
         </div>
-      </div>
     </div>
 
+    <!-- Script de inicialização -->
     <script>
-      // Variáveis para controle
-      let livroParaExcluir = null;
-      
-      // Abre o modal de edição
-      document.querySelectorAll(".edit-icon").forEach((icon) => {
-        icon.addEventListener("click", () => {
-          document.getElementById("edit-modal").classList.remove("hidden");
-        });
-      });
-
-      // Abre o modal de exclusão
-      document.querySelectorAll(".delete-icon").forEach((icon) => {
-        icon.addEventListener("click", function() {
-          const bookId = this.getAttribute("data-id");
-          const row = this.closest("tr");
-          const bookTitle = row.querySelector("td:nth-child(2)").textContent;
-          
-          livroParaExcluir = {
-            id: bookId,
-            element: row,
-            title: bookTitle
-          };
-          
-          // Mostra o título do livro no modal
-          document.getElementById("delete-book-title").textContent = `"${bookTitle}"`;
-          document.getElementById("delete-modal").classList.remove("hidden");
-        });
-      });
-
-      // Fecha modais no X
-      document.querySelectorAll(".close-modal").forEach((closeBtn) => {
-        closeBtn.addEventListener("click", function() {
-          this.closest(".modal").classList.add("hidden");
-          livroParaExcluir = null;
-        });
-      });
-
-      // Fecha modais ao clicar fora
-      document.querySelectorAll(".modal").forEach((modal) => {
-        modal.addEventListener("click", (e) => {
-          if (e.target.classList.contains("modal")) {
-            modal.classList.add("hidden");
-            livroParaExcluir = null;
-          }
-        });
-      });
-
-      // Confirma exclusão
-      document.querySelector(".btn-confirmar-exclusao").addEventListener("click", () => {
-        if (livroParaExcluir) {
-          // Aqui você pode adicionar uma chamada AJAX para excluir do banco de dados
-          console.log(`Excluindo livro ID: ${livroParaExcluir.id} - ${livroParaExcluir.title}`);
-          
-          // Remove a linha da tabela
-          livroParaExcluir.element.remove();
-          
-          // Fecha o modal
-          document.getElementById("delete-modal").classList.add("hidden");
-          livroParaExcluir = null;
-          
-          // Mostra mensagem de sucesso (opcional)
-          alert("Livro excluído com sucesso!");
+        // Inicializa variáveis globais
+        window.API_URLS = {
+            livroDetail: '{% url "api_livro_detail" 0 %}'.replace('0/', ''),
+            livroUpdate: '{% url "api_livro_update" 0 %}'.replace('0/', ''),
+            livroDelete: '{% url "api_livro_delete" 0 %}'.replace('0/', ''),
+        };
+        
+        // Função para obter CSRF token
+        function getCSRFToken() {
+            const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            return csrfInput ? csrfInput.value : '';
         }
-      });
-
-      // Cancela exclusão
-      document.querySelector(".btn-cancelar").addEventListener("click", () => {
-        document.getElementById("delete-modal").classList.add("hidden");
-        livroParaExcluir = null;
-      });
     </script>
-  </body>
+    
+    <script src="{% static 'js/todos_livros.js' %}"></script>
+</body>
 </html>

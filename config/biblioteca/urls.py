@@ -1,4 +1,15 @@
+# biblioteca/urls.py
 from django.urls import path
+from .views.livro_views import (  # IMPORTANTE: importe do módulo específico
+    tela_todos_livros,
+    LivroCreateView,
+    api_livro_detail,
+    api_livro_update,
+    api_livro_delete,
+    RemoverLivroView,
+    AssociarAutorView,
+    AssociarCategoriaView,
+)
 from .views import (
     login_view,
     tela_todos_livros,  
@@ -40,8 +51,13 @@ urlpatterns = [
     # TELA INICIAL
     path("", tela_inicial, name="tela_inicial"),
     
-    # TODOS OS LIVROS (adicione esta - IMPORTANTE!)
+    # TODOS OS LIVROS
     path("todosLivros/", tela_todos_livros, name="tela_todos_livros"),
+    
+    # API para livros
+    path("api/livro/<int:livro_id>/", api_livro_detail, name="api_livro_detail"),
+    path("api/livro/<int:livro_id>/update/", api_livro_update, name="api_livro_update"),
+    path("api/livro/<int:livro_id>/delete/", api_livro_delete, name="api_livro_delete"),
     
     # LIVROS
     path("livro/novo/", LivroCreateView.as_view(), name="livro-create"),
