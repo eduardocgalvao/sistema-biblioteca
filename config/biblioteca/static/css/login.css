@@ -12,6 +12,14 @@
     font-family: 'Lexend', sans-serif;
 }
 
+.logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width:200px;
+
+}
+
 /* ========================================
    ESTILOS DE TIPOGRAFIA
    ======================================== */
@@ -51,6 +59,7 @@ hr {
 /* ========================================
    LAYOUT DO FORMULÁRIO
    ======================================== */
+
 /* Linha que contém múltiplos campos lado a lado */
 .form-row {
     display: flex;
@@ -67,7 +76,7 @@ hr {
 
 /* Modificador para campo que ocupa largura completa */
 .form-group.full {
-    width: 40px;
+    width: 100%;
 }
 
 /* ========================================
@@ -75,14 +84,14 @@ hr {
    ======================================== */
 /* Estilos base para todos os inputs */
 input {
-    width: 420px;
+    width: 100%;
+    max-width: 420px; /* Máximo para desktop */
     padding: 10px 20px;
     border: 1px solid #4db8b6;
     border-radius: 5px;
     outline: none;
     font-weight: 600;
     color: #1c1c1c;
-    padding-left: 1%;
 }
 
 /* Estado de foco (quando o input está ativo) */
@@ -97,7 +106,8 @@ input:focus {
 /* Botão de submit do formulário */
 button {
     cursor: pointer;
-    width: 266px;
+    width: 100%;
+    max-width: 266px;
     height: 40px;
     border: none;
     color: #fff;
@@ -137,10 +147,13 @@ body {
 }
 
 /* Container: wrapper responsivo com largura máxima */
-.container {
+#container {
     width: 100%;
     max-width: 900px;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Card: cartão com estilo de caixa elevada (sombra) */
