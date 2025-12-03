@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -42,10 +41,11 @@
                 </div>
             </form>
         </div>
+    </div>
 
     <!-- POP-UP DE SUCESSO -->
     {% if sucesso %}
-    <div id="popup" class="popup">
+    <div id="popup" class="popup mostrar">
         <div class="popup-content">
             <button class="popup-close" onclick="fecharPopup()">X</button>
             <h2>Autor Salvo <span class="check">✔️</span></h2>
@@ -56,13 +56,23 @@
     </div>
     <script>
         function fecharPopup() {
-            document.getElementById("popup").style.display = "none";
+            document.getElementById("popup").classList.remove("mostrar");
         }
-
-        // Abrir popup automaticamente ao carregar
-        document.getElementById("popup").style.display = "block";
+        
+        // Fechar ao clicar fora do conteúdo
+        document.getElementById("popup").addEventListener('click', function(e) {
+            if (e.target.id === 'popup') {
+                fecharPopup();
+            }
+        });
+        
+        // Fechar com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                fecharPopup();
+            }
+        });
     </script>
     {% endif %}
-
 </body>
 </html>
