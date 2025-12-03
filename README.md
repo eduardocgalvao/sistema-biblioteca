@@ -29,54 +29,6 @@ O desenvolvimento segue metodologias ágeis, garantindo entregas rápidas e iter
 
 ---
 
-## Estrutura do Projeto
-
-```
-
-
-
-
-config/
-├── biblioteca/
-│   ├── **pycache**/
-│   ├── migrations/
-│   ├── static/
-│   │   ├── css/
-│   │   ├── img/
-│   │   └── js/
-│   ├── templates/
-│   ├── views/
-│   ├── **init**.py
-│   ├── admin.py
-│   ├── apps.py
-│   ├── authentication.py
-│   ├── forms.py
-│   ├── models.py
-│   ├── tests.py
-│   └── urls.py
-├── config/
-│   └── settings.json
-media/
-└── capas_livros/
-├── capa_11.png
-├── capa_None.jpg
-└── capa_None.png
-manage.py
-.env
-.gitignore
-README.md
-.vscode/
-└── settings.json
-
-
-
-
-
-
-````
-
----
-
 ## Instalação e Configuração
 
 1. Clone o repositório:
