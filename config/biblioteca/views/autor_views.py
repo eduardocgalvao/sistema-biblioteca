@@ -28,20 +28,30 @@ class AutorListView(View, AutorCRUDMixin):
         return render(request, self.template_name, {"autores": autores})
 
 class AutorCreateView(View, AutorCRUDMixin):
-    """View para criar um novo autor."""
     template_name = "adicionar_autor.html"
     form_class = AutorForm
-    redirect_url = "autor-list"
+    model_class = tbl_autor
     
     def get(self, request):
-        return render(request, self.template_name, self.get_context_data())
+        autores = self.model_class.objects.all()
+        return render(request, self.template_name, {"form": self.form_class(), "autores": autores})
         
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect(self.redirect_url)
-        return render(request, self.template_name, self.get_context_data(form=form))
+            autor = form.save()
+            autores = self.model_class.objects.all()
+            return render(request, self.template_name, {
+                "form": self.form_class(),
+                "autores": autores,
+                "sucesso": True,
+                "autor_id": autor.id_autor,
+                "autor_nome": autor.nome,
+                "autor_sobrenome": autor.sobrenome
+            })
+        autores = self.model_class.objects.all()
+        return render(request, self.template_name, {"form": form, "autores": autores})
+
 
 class AutorUpdateView(View, AutorCRUDMixin):
     """View para atualizar um autor existente."""

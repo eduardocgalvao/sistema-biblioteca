@@ -1,6 +1,7 @@
 # biblioteca/urls.py
 from django.urls import path
-from .views.livro_views import (  # IMPORTANTE: importe do módulo específico
+
+from .views.livro_views import (
     tela_todos_livros,
     LivroCreateView,
     api_livro_detail,
@@ -10,10 +11,9 @@ from .views.livro_views import (  # IMPORTANTE: importe do módulo específico
     AssociarAutorView,
     AssociarCategoriaView,
 )
+
 from .views import (
     login_view,
-    tela_todos_livros,  
-    LivroCreateView,
     AutorListView,
     AutorCreateView,
     AutorUpdateView,
@@ -38,9 +38,6 @@ from .views import (
     MotivoRemocaoCreateView,
     MotivoRemocaoUpdateView,
     MotivoRemocaoDeleteView,
-    AssociarAutorView,
-    AssociarCategoriaView,
-    RemoverLivroView,
     tela_inicial,
 )
 

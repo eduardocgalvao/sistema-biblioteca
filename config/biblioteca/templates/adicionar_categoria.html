@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar Editora</title>
+    <title>Adicionar Categoria</title>
     <link rel="stylesheet" href="{% static 'css/adicionar_editora.css' %}" />
 </head>
 <body>
@@ -36,6 +36,34 @@
 
         </form>
     </div>
+
+    <!-- POPUP -->
+    <div id="popup" class="popup hidden">
+      <div class="popup-content">
+        <button class="popup-close" onclick="fecharPopup()">X</button>
+        <h2>Categoria Salva <span class="check">✔️</span></h2>
+        <p>Id: <span id="popup-id"></span></p>
+        <p>Nome da Categoria: <span id="popup-nome"></span></p>
+      </div>
+    </div>
+
+    <script>
+      function abrirPopup(id, nome) {
+        document.getElementById("popup-id").innerText = id;
+        document.getElementById("popup-nome").innerText = nome;
+        document.getElementById("popup").classList.remove("hidden");
+      }
+
+      function fecharPopup() {
+        document.getElementById("popup").classList.add("hidden");
+      }
+    </script>
+
+    {% if sucesso %}
+    <script>
+        abrirPopup("{{ categoria_id }}", "{{ categoria_nome }}");
+    </script>
+    {% endif %}
 
 </body>
 </html>

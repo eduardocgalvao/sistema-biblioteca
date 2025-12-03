@@ -2,69 +2,67 @@
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Adicionar Autor</title>
     <link rel="stylesheet" href="{% static 'css/adicionar_autor.css' %}" />
-  </head>
-   <body>
+</head>
+<body>
     <a href="{% url 'tela_inicial' %}" class="back-btn">←</a>
 
-  <div class="pagina">
-    <div class="cabecalho-livro">
-        <img src="/static/img/logo.png" class="logo-site">
-        <h1>Adicione um Novo Autor</h1>
-    </div>
+    <div class="pagina">
+        <div class="cabecalho-livro">
+            <img src="{% static 'img/logo.png' %}" class="logo-site">
+            <h1>Adicione um Novo Autor</h1>
+        </div>
 
-    <div class="card-form">
-        <form method="POST">
-            {% csrf_token %}
+        <div class="card-form">
+            <form method="POST" action="{% url 'autor-create' %}">
+                {% csrf_token %}
 
-            <div class="linha-inputs">
-                <div class="campo">
-                    <label>Nome:</label>
-                    <input type="text" name="nome">
+                <div class="linha-inputs">
+                    <div class="campo">
+                        <label for="id_nome">Nome:</label>
+                        <input type="text" name="nome" id="id_nome" value="{{ form.nome.value|default_if_none:'' }}">
+                        {{ form.nome.errors }}
+                    </div>
+
+                    <div class="campo">
+                        <label for="id_sobrenome">Sobrenome:</label>
+                        <input type="text" name="sobrenome" id="id_sobrenome" value="{{ form.sobrenome.value|default_if_none:'' }}">
+                        {{ form.sobrenome.errors }}
+                    </div>
                 </div>
 
-                <div class="campo">
-                    <label>Sobrenome:</label>
-                    <input type="text" name="sobrenome">
+                <div class="btn-area">
+                    <button type="submit" class="btn-salvar">
+                        Adicionar Autor
+                    </button>
                 </div>
-            </div>
+            </form>
+        </div>
 
-            <div class="btn-area">
-                <button type="submit" class="btn-salvar">
-                    Adicionar Autor
-                </button>
-            </div>
-        </form>
+    <!-- POP-UP DE SUCESSO -->
+    {% if sucesso %}
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <button class="popup-close" onclick="fecharPopup()">X</button>
+            <h2>Autor Salvo <span class="check">✔️</span></h2>
+            <p>Id: <span id="popup-id">{{ autor_id }}</span></p>
+            <p>Nome: <span id="popup-nome">{{ autor_nome }}</span></p>
+            <p>Sobrenome: <span id="popup-sobrenome">{{ autor_sobrenome }}</span></p>
+        </div>
     </div>
-</div>
-
-
-    <!-- POP-UP -->
-    <div id="popup" class="popup hidden">
-      <div class="popup-content">
-        <button class="popup-close" onclick="fecharPopup()">X</button>
-        <h2>Autor Salvo <span class="check">✔️</span></h2>
-        <p>Id: <span id="popup-id"></span></p>
-        <p>Nome: <span id="popup-nome"></span></p>
-        <p>Sobrenome: <span id="popup-sobrenome"></span></p>
-      </div>
-    </div>
-
     <script>
-      function abrirPopup(id, nome, sobrenome) {
-        document.getElementById("popup-id").innerText = id;
-        document.getElementById("popup-nome").innerText = nome;
-        document.getElementById("popup-sobrenome").innerText = sobrenome;
-        document.getElementById("popup").classList.remove("hidden");
-      }
+        function fecharPopup() {
+            document.getElementById("popup").style.display = "none";
+        }
 
-      function fecharPopup() {
-        document.getElementById("popup").classList.add("hidden");
-      }
+        // Abrir popup automaticamente ao carregar
+        document.getElementById("popup").style.display = "block";
     </script>
-  </body>
+    {% endif %}
+
+</body>
 </html>

@@ -21,11 +21,17 @@ class CategoriaCreateView(View):
     def post(self, request):
         form = CategoriaForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect("categoria-list")
-        return render(request, self.template_name, {"form": form})
+            categoria = form.save()
 
-class CategoriaUpdateView(View):  # ← ADICIONE ESTA
+            return render(request, self.template_name, {
+                "form": CategoriaForm(),
+                "sucesso": True,
+                "categoria_id": categoria.id_categoria,   # ajuste se o nome for outro
+                "categoria_nome": categoria.nome
+            })
+
+        return render(request, self.template_name, {"form": form})
+class CategoriaUpdateView(View):
     template_name = "adicionar_categoria.html"
 
     def get(self, request, pk):
@@ -41,7 +47,7 @@ class CategoriaUpdateView(View):  # ← ADICIONE ESTA
             return redirect("categoria-list")
         return render(request, self.template_name, {"form": form, "categoria": categoria})
 
-class CategoriaDeleteView(View):  # ← ADICIONE ESTA
+class CategoriaDeleteView(View):
     template_name = "adicionar_categoria.html"
 
     def get(self, request, pk):
