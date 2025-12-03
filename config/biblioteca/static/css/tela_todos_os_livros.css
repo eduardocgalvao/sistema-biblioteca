@@ -16,15 +16,17 @@
     min-height: 100vh;
 }
 
-/* Header com barra de pesquisa */
+/* ========== TOP-BAR PARA DESKTOP ========== */
+/* Layout: Voltar [ESQUERDA] | Pesquisa [CENTRO] | Logo [DIREITA] */
 .top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 30px;
-    gap: 20px;
+    height: 60px;
 }
 
+/* Botão Voltar na ESQUERDA */
 .voltar {
     font-size: 25px;
     text-decoration: none;
@@ -32,20 +34,26 @@
     font-weight: bold;
     transition: color 0.3s ease;
     white-space: nowrap;
+    flex: 0 0 auto;
 }
 
 .voltar:hover {
     color: #017a78;
 }
 
-/* Barra de pesquisa */
+/* Barra de Pesquisa CENTRALIZADA */
 .search-box {
     flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     max-width: 600px;
+    margin: 0 auto;
 }
 
 .search-box input {
     width: 100%;
+    max-width: 500px;
     background: #fff;
     border: 1px solid #ddd;
     outline: none;
@@ -61,10 +69,11 @@
     box-shadow: 0 2px 8px rgba(1, 156, 153, 0.2);
 }
 
-/* Logo */
+/* Logo na DIREITA */
 .logo-bookstack {
     width: 80px;
     height: auto;
+    flex: 0 0 auto;
 }
 
 /* ========== TABELA DE LIVROS ========== */
@@ -250,6 +259,11 @@
     z-index: 10000 !important;
 }
 
+/* Garantir que o Select2 ocupe toda a largura do campo */
+.campo.select2-container {
+    width: 100% !important;
+}
+
 /* ========== MODAIS ========== */
 .modal {
     position: fixed;
@@ -275,10 +289,12 @@
 /* Conteúdo do modal */
 .modal-content {
     background: white;
-    width: 80%;
-    max-width: 800px;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
     border-radius: 12px;
-    padding: 40px 50px;
+    padding: 30px;
     position: relative;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     transform: translateY(-20px);
@@ -327,8 +343,8 @@
 .form-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 25px 40px;
-    margin-top: 20px;
+    gap: 25px;
+    margin: 20px 0 30px 0;
 }
 
 .campo {
@@ -341,10 +357,12 @@
     font-weight: 600;
     color: #333;
     margin-bottom: 8px;
+    display: block;
 }
 
 .campo input,
-.campo select {
+.campo select,
+.select2-container .select2-selection {
     width: 100%;
     padding: 12px 15px;
     border: 1px solid #ddd;
@@ -354,12 +372,16 @@
     color: #333;
     background-color: white;
     transition: all 0.3s ease;
+    min-height: 46px;
+    line-height: 1.5;
 }
 
+/* Foco consistente */
 .campo input:focus,
-.campo select:focus {
-    border-color: #019c99;
-    box-shadow: 0 0 0 3px rgba(1, 156, 153, 0.1);
+.campo select:focus,
+.select2-container--default.select2-container--focus .select2-selection {
+    border-color: #019c99 !important;
+    box-shadow: 0 0 0 3px rgba(1, 156, 153, 0.1) !important;
 }
 
 .campo select {
@@ -371,11 +393,118 @@
     padding-right: 40px;
 }
 
-/* Estilo específico para select de autores (Select2) */
-.campo select.select2-autores {
+/* ========== ESTILOS PARA O CAMPO DE CAPA ========== */
+
+/* Container da capa */
+.campo.full-width {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+}
+
+.capa-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 10px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    align-items: center;
+}
+
+/* Preview da capa */
+.capa-preview {
+    width: 120px;
+    height: 160px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #f8f9fa;
+    flex-shrink: 0;
+}
+
+.capa-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.capa-placeholder {
+    text-align: center;
+    color: #999;
+    font-size: 12px;
+    padding: 10px;
+}
+
+.capa-placeholder span {
+    font-size: 30px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Input de arquivo customizado */
+.file-input-container {
+    flex: 1;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-input-label {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #019c99;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+    border: none;
+}
+
+.file-input-label:hover {
+    background: #017a78;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(1, 156, 153, 0.2);
+}
+
+.file-help {
+    display: block;
+    color: #666;
+    font-size: 12px;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+/* Checkbox para remover capa */
+.remove-capa-container {
+    margin-top: 15px;
     padding: 12px 15px;
-    height: auto;
-    min-height: 44px;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+}
+
+.remove-capa-container input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+}
+
+.remove-capa-container label {
+    color: #856404;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+    text-align: center;
 }
 
 /* ========== BOTÕES ========== */
@@ -383,7 +512,9 @@
     margin-top: 40px;
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
+    gap: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
 }
 
 .btn-salvar,
@@ -391,11 +522,13 @@
 .btn-confirmar-exclusao {
     padding: 12px 30px;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
+    min-width: 150px;
+    text-align: center;
 }
 
 /* Botão primário (salvar) */
@@ -454,6 +587,7 @@
     border-radius: 8px;
     border-left: 4px solid #f44336;
     text-align: center;
+    line-height: 1.4;
 }
 
 .modal-buttons {
@@ -473,100 +607,4 @@
     background-color: #d32f2f;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(244, 67, 54, 0.2);
-}
-
-/* ========== RESPONSIVIDADE ========== */
-
-/* Tablets grandes e laptops pequenos */
-@media (max-width: 1200px) {
-    .livros-container {
-        padding: 20px;
-    }
-    
-    .card-tabela {
-        padding: 20px;
-        border-radius: 10px;
-    }
-}
-
-/* Tablets */
-@media (max-width: 992px) {
-    .top-bar {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .search-box {
-        width: 100%;
-        max-width: 500px;
-    }
-    
-    .modal-content {
-        width: 95%;
-        padding: 30px;
-    }
-    
-    .form-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-}
-
-/* Celulares grandes */
-@media (max-width: 768px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .modal-content {
-        padding: 25px 20px;
-    }
-    
-    .btn-area,
-    .modal-buttons {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .btn-salvar,
-    .btn-cancelar,
-    .btn-confirmar-exclusao {
-        width: 100%;
-    }
-    
-    /* Melhor legibilidade em telas pequenas */
-    .tabela-livros {
-        font-size: 13px;
-    }
-    
-    .tabela-livros thead th,
-    .tabela-livros tbody td {
-        padding: 10px 8px;
-    }
-    
-    /* Ajuste Select2 para mobile */
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        font-size: 11px !important;
-        padding: 2px 6px !important;
-    }
-}
-
-/* Celulares pequenos */
-@media (max-width: 480px) {
-    .livros-container {
-        padding: 10px;
-    }
-    
-    .card-tabela {
-        padding: 15px;
-    }
-    
-    .modal-content {
-        padding: 20px 15px;
-    }
-    
-    .status-badge {
-        font-size: 10px;
-        padding: 3px 8px;
-    }
 }

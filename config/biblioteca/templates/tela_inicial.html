@@ -23,58 +23,52 @@
       </div>
 
       <nav class="menu">
-        <a href="/todosLivros/#"><i>📚</i> Todos os Livros</a>
-        <a href="livro/novo/#"><i>➕</i> Adicionar Livros</a>
-        <a href="editoras/novo/#"><i>🏢</i> Editoras</a>
-        <a href="autores/novo/#"><i>🖋️</i> Autores</a>
-        <a href="categorias/novo/#"><i>📦</i> Categorias</a>
+        <a href="/todosLivros/"><i>📚</i> Todos os Livros</a>
+        <a href="/livro/novo/"><i>➕</i> Adicionar Livros</a>
+        <a href="/editoras/"><i>🏢</i> Editoras</a>
+        <a href="/autores/"><i>🖋️</i> Autores</a>
+        <a href="/categorias/"><i>📦</i> Categorias</a>
       </nav>
 
       <div class="logout">
-        <a href="/login/#"><i>🚪</i> Encerrar Sessão</a>
+        <a href="/login/"><i>🚪</i> Encerrar Sessão</a>
       </div>
     </aside>
 
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="content">
-      <div class="search-box">
-        <input type="text" placeholder="Procurar por nome do livro..." />
-      </div>
+
+      <!-- BARRA DE PESQUISA -->
+      <form method="GET" class="search-box">
+        <input
+          type="text"
+          name="q"
+          placeholder="Procurar por nome do livro..."
+          value="{{ query|default:'' }}"
+        />
+      </form>
 
       <h1 class="title">Catálogo de Livros</h1>
 
       <section class="books-grid">
-        <!-- CARD DO LIVRO (repita usando Django ou backend) -->
-        <div class="book-card">
-          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
-          <p>Harry Potter and The Cursed Child</p>
-        </div>
 
+        {% for livro in livros %}
         <div class="book-card">
-          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
-          <p>Harry Potter and The Cursed Child</p>
-        </div>
+          
+          {% if livro.capa %}
+          <img src="{{ livro.capa.url }}" alt="{{ livro.titulo }}" />
+          {% else %}
+          <img src="{% static 'img/placeholder.png' %}" alt="Sem capa" />
+          {% endif %}
 
-        <div class="book-card">
-          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
-          <p>Harry Potter and The Cursed Child</p>
+          <p>{{ livro.titulo }}</p>
         </div>
+        {% empty %}
+        <p>Nenhum livro encontrado.</p>
+        {% endfor %}
 
-        <div class="book-card">
-          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
-          <p>Harry Potter and The Cursed Child</p>
-        </div>
-
-        <div class="book-card">
-          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
-          <p>Harry Potter and The Cursed Child</p>
-        </div>
-
-        <div class="book-card">
-          <img src="{% static 'img/capa.jpg' %}" alt="Livro" />
-          <p>Harry Potter and The Cursed Child</p>
-        </div>
       </section>
+
     </main>
   </body>
 </html>

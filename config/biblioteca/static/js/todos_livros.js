@@ -1,5 +1,12 @@
-// todos_livros.js - Script atualizado
+// todos_livros.js - VERSÃO COMPLETA COM ATUALIZAÇÃO DE CAPA
 console.log("Script todos_livros.js carregado");
+
+// Variáveis globais
+let capaOriginalUrl = null;
+let novaCapaFile = null;
+let livroParaExcluir = null;
+let livroParaEditar = null;
+let autoresSelect2Instance = null;
 
 // Configuração do CSRF para AJAX
 function getCookie(name) {
@@ -22,7 +29,8 @@ const csrftoken = getCookie('csrftoken');
 console.log("API_URLS:", window.API_URLS);
 console.log("CSRF Token:", csrftoken ? "Encontrado" : "Não encontrado");
 
-// Funções AJAX
+// ========== FUNÇÕES AJAX ==========
+
 async function fetchLivro(id) {
     console.log(`Buscando livro ID: ${id}`);
     try {
@@ -55,22 +63,34 @@ async function fetchLivro(id) {
     }
 }
 
-async function updateLivro(id, data) {
-    console.log(`Atualizando livro ID: ${id}`, data);
+// FUNÇÃO ATUALIZADA: updateLivro com suporte a FormData
+async function updateLivro(id, data, isFormData = false) {
+    console.log(`Atualizando livro ID: ${id}`);
+    
     try {
         const url = `/api/livro/${id}/update/`;
         console.log("URL:", url);
         
-        const response = await fetch(url, {
+        let requestOptions = {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+            }
+        };
         
+        if (isFormData) {
+            // Usa FormData (para envio de arquivos)
+            requestOptions.body = data;
+            console.log("Enviando FormData com arquivo");
+        } else {
+            // Usa JSON (modo antigo)
+            requestOptions.headers['Content-Type'] = 'application/json';
+            requestOptions.headers['Accept'] = 'application/json';
+            requestOptions.body = JSON.stringify(data);
+            console.log("Enviando JSON:", data);
+        }
+        
+        const response = await fetch(url, requestOptions);
         console.log("Status:", response.status);
         
         if (!response.ok) {
@@ -123,34 +143,57 @@ async function deleteLivro(id) {
     }
 }
 
-// Variáveis para controle
-let livroParaExcluir = null;
-let livroParaEditar = null;
-let autoresSelect2Instance = null;
+// ========== FUNÇÕES AUXILIARES ==========
 
-// Configuração dos eventos quando o DOM estiver carregado
+function inicializarSelect2Autores() {
+    if (!autoresSelect2Instance && $('#edit-autores').length) {
+        autoresSelect2Instance = $('#edit-autores').select2({
+            width: '100%',
+            placeholder: 'Selecione os autores',
+            allowClear: true,
+            dropdownParent: $('#edit-modal')
+        });
+        console.log("Select2 inicializado para autores");
+    }
+}
+
+function limparSelect2Autores() {
+    if (autoresSelect2Instance) {
+        autoresSelect2Instance.val(null).trigger('change');
+    }
+}
+
+function closeAllModals() {
+    document.querySelectorAll(".modal").forEach(modal => {
+        modal.classList.add("hidden");
+    });
+    livroParaExcluir = null;
+    livroParaEditar = null;
+    limparSelect2Autores();
+    console.log("Todos os modais fechados");
+}
+
+function validarImagem(file) {
+    // Valida tamanho (5MB = 5 * 1024 * 1024 bytes)
+    if (file.size > 5 * 1024 * 1024) {
+        alert("A imagem é muito grande. Tamanho máximo: 5MB");
+        return false;
+    }
+    
+    // Valida tipo de arquivo
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type.toLowerCase())) {
+        alert("Formato de imagem inválido. Use JPG, PNG, GIF ou WebP.");
+        return false;
+    }
+    
+    return true;
+}
+
+// ========== CONFIGURAÇÃO DOS EVENTOS ==========
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM carregado, configurando eventos...");
-    
-    // ========== FUNÇÃO: INICIALIZAR SELECT2 PARA AUTORES ==========
-    function inicializarSelect2Autores() {
-        if (!autoresSelect2Instance && $('#edit-autores').length) {
-            autoresSelect2Instance = $('#edit-autores').select2({
-                width: '100%',
-                placeholder: 'Selecione os autores',
-                allowClear: true,
-                dropdownParent: $('#edit-modal')
-            });
-            console.log("Select2 inicializado para autores");
-        }
-    }
-    
-    // ========== FUNÇÃO: LIMPAR SELECT2 QUANDO MODAL FECHAR ==========
-    function limparSelect2Autores() {
-        if (autoresSelect2Instance) {
-            autoresSelect2Instance.val(null).trigger('change');
-        }
-    }
     
     // ========== EVENTO: ABRIR MODAL DE EDIÇÃO ==========
     const editIcons = document.querySelectorAll(".edit-icon");
@@ -160,6 +203,15 @@ document.addEventListener('DOMContentLoaded', function() {
         icon.addEventListener("click", async function() {
             const livroId = this.getAttribute("data-id");
             console.log(`Clicou em editar livro ID: ${livroId}`);
+
+            // Resetar variáveis da capa
+            capaOriginalUrl = null;
+            novaCapaFile = null;
+            const removeCapaCheckbox = document.getElementById('remove-capa');
+            const capaInput = document.getElementById('edit-capa');
+            
+            if (removeCapaCheckbox) removeCapaCheckbox.checked = false;
+            if (capaInput) capaInput.value = '';
             
             // Busca dados do livro
             const livro = await fetchLivro(livroId);
@@ -177,14 +229,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Inicializa Select2 se ainda não foi
                 inicializarSelect2Autores();
                 
-                // Preenche os autores no Select2 usando os IDs
-                // AGORA usando 'autores_ids' (plural)
+                // Preenche os autores no Select2
                 if (livro.autores_ids && Array.isArray(livro.autores_ids)) {
                     $('#edit-autores').val(livro.autores_ids).trigger('change');
                     console.log("Autores preenchidos:", livro.autores_ids);
                 } else {
-                    console.log("Nenhum autor encontrado ou formato inválido");
                     $('#edit-autores').val(null).trigger('change');
+                }
+
+                // Preenche a preview da capa
+                const previewImg = document.getElementById('capa-preview-img');
+                const placeholder = document.getElementById('capa-placeholder');
+                
+                if (livro.capa_url) {
+                    capaOriginalUrl = livro.capa_url;
+                    previewImg.src = livro.capa_url;
+                    previewImg.style.display = 'block';
+                    if (placeholder) placeholder.style.display = 'none';
+                    console.log("Capa carregada:", livro.capa_url);
+                } else {
+                    previewImg.style.display = 'none';
+                    if (placeholder) placeholder.style.display = 'flex';
                 }
                 
                 // Abre o modal
@@ -195,6 +260,65 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // ========== EVENTO: MUDANÇA NA INPUT DE CAPA ==========
+    const capaInput = document.getElementById('edit-capa');
+    if (capaInput) {
+        capaInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Valida a imagem
+                if (!validarImagem(file)) {
+                    this.value = '';
+                    return;
+                }
+                
+                novaCapaFile = file;
+                
+                // Criar preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewImg = document.getElementById('capa-preview-img');
+                    const placeholder = document.getElementById('capa-placeholder');
+                    
+                    if (previewImg) {
+                        previewImg.src = e.target.result;
+                        previewImg.style.display = 'block';
+                    }
+                    if (placeholder) placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+                
+                // Desmarcar o checkbox de remover capa
+                const removeCapaCheckbox = document.getElementById('remove-capa');
+                if (removeCapaCheckbox) removeCapaCheckbox.checked = false;
+                
+                console.log("Nova capa selecionada:", file.name);
+            }
+        });
+    }
+
+    // ========== EVENTO: REMOVER CAPA ==========
+    const removeCapaCheckbox = document.getElementById('remove-capa');
+    if (removeCapaCheckbox) {
+        removeCapaCheckbox.addEventListener('change', function(e) {
+            if (this.checked) {
+                // Limpar o input de arquivo
+                const capaInput = document.getElementById('edit-capa');
+                if (capaInput) capaInput.value = '';
+                novaCapaFile = null;
+                
+                // Mostrar placeholder
+                const previewImg = document.getElementById('capa-preview-img');
+                const placeholder = document.getElementById('capa-placeholder');
+                
+                if (previewImg) previewImg.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'flex';
+                
+                console.log("Remover capa ativado");
+            }
+        });
+    }
 
     // ========== EVENTO: ABRIR MODAL DE EXCLUSÃO ==========
     const deleteIcons = document.querySelectorAll(".delete-icon");
@@ -219,17 +343,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById("delete-modal").classList.remove("hidden");
         });
     });
-
-    // ========== FUNÇÃO: FECHAR TODOS OS MODAIS ==========
-    function closeAllModals() {
-        document.querySelectorAll(".modal").forEach(modal => {
-            modal.classList.add("hidden");
-        });
-        livroParaExcluir = null;
-        livroParaEditar = null;
-        limparSelect2Autores();
-        console.log("Todos os modais fechados");
-    }
 
     // ========== EVENTO: FECHAR MODAIS ==========
     const closeButtons = document.querySelectorAll(".close-modal, .btn-cancelar");
@@ -261,23 +374,61 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
+            // Verifica se há uma nova capa ou se quer remover a capa
+            const removeCapa = document.getElementById('remove-capa')?.checked || false;
+            const temNovaCapa = novaCapaFile !== null;
+            const deveEnviarFormData = temNovaCapa || removeCapa;
+            
             // Pega os autores selecionados no Select2
             const autoresSelecionados = $('#edit-autores').val() || [];
             console.log("Autores selecionados:", autoresSelecionados);
             
-            // IMPORTANTE: Agora use 'autores_ids' (plural)
-            const formData = {
-                titulo: document.getElementById("edit-titulo").value,
-                editora_id: document.getElementById("edit-editora").value,
-                ano_publicacao: document.getElementById("edit-ano").value,
-                categoria_id: document.getElementById("edit-categoria").value,
-                status_id: document.getElementById("edit-status").value,
-                autores_ids: autoresSelecionados // Use 'autores_ids' (plural) aqui!
-            };
+            let result;
             
-            console.log("Dados para atualizar:", formData);
+            if (deveEnviarFormData) {
+                // Usa FormData para enviar arquivos
+                const formData = new FormData();
+                
+                // Adiciona campos básicos
+                formData.append('titulo', document.getElementById("edit-titulo").value);
+                formData.append('editora_id', document.getElementById("edit-editora").value);
+                formData.append('ano_publicacao', document.getElementById("edit-ano").value);
+                formData.append('categoria_id', document.getElementById("edit-categoria").value);
+                formData.append('status_id', document.getElementById("edit-status").value);
+                
+                // Adiciona autores como JSON string
+                formData.append('autores_ids', JSON.stringify(autoresSelecionados));
+                
+                // Adiciona capa se houver nova
+                if (temNovaCapa) {
+                    formData.append('capa', novaCapaFile);
+                    console.log("Enviando nova capa:", novaCapaFile.name);
+                }
+                
+                // Adiciona flag para remover capa
+                if (removeCapa) {
+                    formData.append('remove_capa', 'true');
+                    console.log("Flag para remover capa enviada");
+                }
+                
+                console.log("Enviando FormData com capa");
+                result = await updateLivro(livroParaEditar, formData, true);
+                
+            } else {
+                // Usa JSON normal (sem capa)
+                const formData = {
+                    titulo: document.getElementById("edit-titulo").value,
+                    editora_id: document.getElementById("edit-editora").value,
+                    ano_publicacao: document.getElementById("edit-ano").value,
+                    categoria_id: document.getElementById("edit-categoria").value,
+                    status_id: document.getElementById("edit-status").value,
+                    autores_ids: autoresSelecionados
+                };
+                
+                console.log("Enviando JSON sem capa");
+                result = await updateLivro(livroParaEditar, formData, false);
+            }
             
-            const result = await updateLivro(livroParaEditar, formData);
             console.log("Resultado da atualização:", result);
             
             if (result.success) {

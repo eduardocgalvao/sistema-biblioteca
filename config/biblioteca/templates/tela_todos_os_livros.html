@@ -19,12 +19,12 @@
     <div class="livros-container">
         <!-- Header com barra de pesquisa -->
         <header class="top-bar">
-            <a href="{% url 'tela_inicial' %}" class="voltar">← Voltar</a>
+            <a href="{% url 'tela_inicial' %}" class="voltar">←</a>
             
             <div class="search-box">
                 <input type="text" id="search-input" placeholder="Procurar por nome do livro..." />
             </div>
-            
+
             <img src="{% static 'img/logo.png' %}" class="logo-bookstack" alt="BookStack Logo" />
         </header>
 
@@ -128,13 +128,13 @@
                 <div class="form-grid">
                     <!-- Campo: Título -->
                     <div class="campo">
-                        <label>Título:</label>
+                        <label for="edit-titulo">Título *</label>
                         <input type="text" id="edit-titulo" name="titulo" required />
                     </div>
 
                     <!-- Campo: Editora -->
                     <div class="campo">
-                        <label>Editora:</label>
+                        <label for="edit-editora">Editora</label>
                         <select id="edit-editora" name="editora_id">
                             <option value="">Selecione...</option>
                             {% for editora in editoras %}
@@ -143,25 +143,15 @@
                         </select>
                     </div>
 
-                    <!-- Campo: Autores - Select2 Multiple -->
-                    <div class="campo">
-                        <label>Autores:</label>
-                        <select id="edit-autores" name="autores_id" multiple="multiple" class="select2-autores">
-                            {% for autor in autores %}
-                                <option value="{{ autor.id_autor }}">{{ autor.nome }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
                     <!-- Campo: Ano de Publicação -->
                     <div class="campo">
-                        <label>Ano Publicação:</label>
-                        <input type="number" id="edit-ano" name="ano_publicacao" />
+                        <label for="edit-ano">Ano Publicação</label>
+                        <input type="number" id="edit-ano" name="ano_publicacao" min="1000" max="2099" />
                     </div>
 
                     <!-- Campo: Categoria -->
                     <div class="campo">
-                        <label>Categoria:</label>
+                        <label for="edit-categoria">Categoria</label>
                         <select id="edit-categoria" name="categoria_id">
                             <option value="">Selecione...</option>
                             {% for cat in categorias %}
@@ -172,13 +162,54 @@
 
                     <!-- Campo: Status -->
                     <div class="campo">
-                        <label>Status:</label>
-                        <select id="edit-status" name="status_id">
+                        <label for="edit-status">Status *</label>
+                        <select id="edit-status" name="status_id" required>
                             <option value="">Selecione...</option>
                             {% for status in status_list %}
                                 <option value="{{ status.id_status }}">{{ status.descricao|title }}</option>
                             {% endfor %}
                         </select>
+                    </div>
+
+                    <!-- Campo: Autores - Select2 Multiple -->
+                    <div class="campo">
+                        <label for="edit-autores">Autores</label>
+                        <select id="edit-autores" name="autores" multiple="multiple" class="select2-autores">
+                            {% for autor in autores %}
+                                <option value="{{ autor.id_autor }}">{{ autor.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Campo: Capa do Livro -->
+                <div class="campo full-width">
+                    <label>Capa do Livro</label>
+                    <div class="capa-container">
+                        <!-- Preview da imagem atual -->
+                        <div id="capa-preview" class="capa-preview">
+                            <img id="capa-preview-img" src="" alt="Preview da capa" style="display: none;" />
+                            <div id="capa-placeholder" class="capa-placeholder">
+                                <span>📚</span>
+                                <small>Sem capa</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Input de arquivo -->
+                        <div class="file-input-container">
+                            <input type="file" id="edit-capa" name="capa" accept="image/*" 
+                                   class="file-input" />
+                            <label for="edit-capa" class="file-input-label">
+                                📷 Escolher nova capa
+                            </label>
+                            <small class="file-help">Formatos: JPG, PNG, GIF • Máximo: 5MB</small>
+                            
+                            <!-- Checkbox para remover capa -->
+                            <div class="remove-capa-container">
+                                <input type="checkbox" id="remove-capa" name="remove_capa" />
+                                <label for="remove-capa">Remover capa atual</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
