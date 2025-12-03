@@ -16,7 +16,6 @@ class EditoraListView(View):
 
 #CRIAR EDITORA ----------------------------------------------------------
 
-
 class EditoraCreateView(View):
     template_name = "adicionar_editora.html"
 
@@ -27,9 +26,14 @@ class EditoraCreateView(View):
     def post(self, request):
         form = EditoraForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect("editora-list")
-        return render(request, self.template_name, {"form": form})
+            editora = form.save()
+            
+            return render(request, self.template_name, {
+                "form": form, 
+                "sucesso": True, 
+                "editora_id": editora.id_editora, 
+                "editora_nome": editora.nome
+            })
 
 # EDITAR EDITORA ---------------------------------------------------------
 

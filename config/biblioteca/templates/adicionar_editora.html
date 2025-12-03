@@ -42,5 +42,45 @@
         </div>
       </form>
     </div>
+
+        <!-- POPUP -->
+    <div id="popup" class="popup hidden">
+        <div class="popup-content">
+            <button class="popup-close" onclick="fecharPopup()">X</button>
+            <h2>Editora Salva <span class="check">✔️</span></h2>
+            <p>Id: <span id="popup-id"></span></p>
+            <p>Nome da Editora: <span id="popup-nome"></span></p>
+        </div>
+    </div>
+
+    <script>
+        function abrirPopup(id, nome) {
+            document.getElementById("popup-id").innerText = id;
+            document.getElementById("popup-nome").innerText = nome;
+            document.getElementById("popup").classList.remove("hidden");
+        }
+
+        function fecharPopup() {
+            document.getElementById("popup").classList.add("hidden");
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.multi-select').select2({
+                placeholder: "Selecione...",
+                width: '100%'
+            });
+        });
+    </script>
+
+    {% if sucesso %}
+        <script>
+            abrirPopup("{{ editora_id }}", "{{ editora_nome }}");
+        </script>
+    {% endif %}
   </body>
 </html>

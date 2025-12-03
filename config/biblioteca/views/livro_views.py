@@ -11,6 +11,8 @@ class LivroCreateView(View):
     def get(self, request):
         form = LivroCreateForm(request.POST)
         editoras = tbl_editora.objects.all()
+        return render(request, self.template_name, {"form": form, "editoras": editoras})
+
 
     def post(self, request):
         form = LivroCreateForm(request.POST)
