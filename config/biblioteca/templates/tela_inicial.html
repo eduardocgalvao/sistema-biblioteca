@@ -4,9 +4,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Tela de catálogo -->
     <title>Catálogo de Livros - BookStack</title>
 
+    <!-- Estilos principais -->
     <link rel="stylesheet" href="{% static 'css/tela_inicial.css' %}" />
+
+    <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,7 +21,7 @@
   </head>
 
   <body>
-    <!-- MENU LATERAL -->
+    <!-- Menu lateral -->
     <aside class="sidebar">
       <div class="logo-area">
         <img src="{% static 'img/logo.png' %}" alt="Logo" />
@@ -35,10 +40,10 @@
       </div>
     </aside>
 
-    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- Conteúdo principal -->
     <main class="content">
 
-      <!-- BARRA DE PESQUISA -->
+      <!-- Busca por título -->
       <form method="GET" class="search-box">
         <input
           type="text"
@@ -54,7 +59,8 @@
 
         {% for livro in livros %}
         <div class="book-card">
-          
+
+          <!-- Capa do livro -->
           {% if livro.capa %}
           <img src="{{ livro.capa.url }}" alt="{{ livro.titulo }}" />
           {% else %}
@@ -63,7 +69,9 @@
 
           <p>{{ livro.titulo }}</p>
         </div>
+
         {% empty %}
+        <!-- Lista vazia -->
         <p>Nenhum livro encontrado.</p>
         {% endfor %}
 
