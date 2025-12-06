@@ -1,0 +1,47 @@
+/* CSS BASE PARA TODAS AS TELAS */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* MENU LATERAL FIXO */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    background-color: #1e1e1e;
+    padding: 20px;
+    color: white;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 30px;
+}
+
+.sidebar ul li {
+    margin: 18px 0;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.sidebar ul li a:hover {
+    opacity: 0.8;
+}
+
+/* Área principal */
+.content {
+    margin-left: 260px;   /* espaço para o menu */
+    padding: 20px;
+}

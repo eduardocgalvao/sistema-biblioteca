@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+<!----Retirada das tags para centralizar o fluxo de telas no base.html ---->
+{% block content %}
+
+<!-- CSS específico para esta tela -->
+<link rel="stylesheet" href="{% static 'css/tela_inicial.css' %}" />
+
+<aside class="sidebar">
+    ...
+</aside>
+
+<main class="content">
+
+    <form method="GET" class="search-box">
+        <input type="text" name="q" placeholder="Procurar por nome do livro...">
+    </form>
+
+    <h1 class="title">Catálogo de Livros</h1>
+
+    <section class="books-grid">
+        {% for livro in livros %}
+        <div class="book-card">
+            {% if livro.capa %}
+            <img src="{{ livro.capa.url }}" alt="{{ livro.titulo }}" />
+            {% else %}
+            <img src="{% static 'img/placeholder.png' %}" alt="Sem capa" />
+            {% endif %}
+            <p>{{ livro.titulo }}</p>
+        </div>
+        {% empty %}
+        <p>Nenhum livro encontrado.</p>
+        {% endfor %}
+    </section>
+
+</main>
+
+{% endblock %}

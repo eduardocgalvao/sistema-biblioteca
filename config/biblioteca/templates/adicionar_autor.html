@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/adicionar_autor.css' %}" />
+
+<a href="{% url 'tela_inicial' %}" class="back-btn">←</a>
+
+<div class="pagina">
+    <div class="cabecalho-livro">
+        <img src="{% static 'img/logo.png' %}" class="logo-site">
+        <h1>Adicione um Novo Autor</h1>
+    </div>
+
+    <div class="card-form">
+        <form method="POST" action="{% url 'autor-create' %}">
+            {% csrf_token %}
+
+            <div class="linha-inputs">
+                <div class="campo">
+                    <label for="id_nome">Nome:</label>
+                    <input type="text" name="nome" id="id_nome" value="{{ form.nome.value|default_if_none:'' }}">
+                    {{ form.nome.errors }}
+                </div>
+
+                <div class="campo">
+                    <label for="id_sobrenome">Sobrenome:</label>
+                    <input type="text" name="sobrenome" id="id_sobrenome" value="{{ form.sobrenome.value|default_if_none:'' }}">
+                    {{ form.sobrenome.errors }}
+                </div>
+            </div>
+
+            <div class="btn-area">
+                <button type="submit" class="btn-salvar">
+                    Adicionar Autor
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if sucesso %}
+<div id="popup" class="popup mostrar">
+    <div class="popup-content">
+        <button class="popup-close" onclick="fecharPopup()">X</button>
+        <h2>Autor Salvo <span class="check">✔️</span></h2>
+        <p>Id: <span id="popup-id">{{ autor_id }}</span></p>
+        <p>Nome: <span id="popup-nome">{{ autor_nome }}</span></p>
+        <p>Sobrenome: <span id="popup-sobrenome">{{ autor_sobrenome }}</span></p>
+    </div>
+</div>
+
+<script>
+    function fecharPopup() {
+        document.getElementById("popup").classList.remove("mostrar");
+    }
+
+    document.getElementById("popup").addEventListener('click', function(e) {
+        if (e.target.id === 'popup') fecharPopup();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') fecharPopup();
+    });
+</script>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+<!----Retirada das tags para centralizar o fluxo de telas no base.html ---->
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/adicionar_editora.css' %}">
+
+<a href="{% url 'tela_inicial' %}" class="back-btn">←</a>
+
+<div class="top-header">
+    <img src="{% static 'img/logo.png' %}" class="logo" alt="Logo do sistema">
+    <h1 class="titulo">Adicionar Categoria</h1>
+</div>
+
+<div class="container">
+
+    <form action="{% url 'categoria-create' %}" method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <div class="campo">
+                <label>Nome da Categoria:</label>
+                <input type="text" name="nome" required>
+            </div>
+        </div>
+
+        <div class="btn-area">
+            <button class="btn-add">Adicionar Categoria</button>
+        </div>
+
+    </form>
+</div>
+
+<!-- POPUP -->
+<div id="popup" class="popup hidden">
+    <div class="popup-content">
+
+        <button class="popup-close" onclick="fecharPopup()">X</button>
+
+        <h2>Categoria Salva <span class="check">✔️</span></h2>
+
+        <p>Id: <span id="popup-id"></span></p>
+        <p>Nome da Categoria: <span id="popup-nome"></span></p>
+    </div>
+</div>
+
+<script>
+    function abrirPopup(id, nome) {
+        document.getElementById("popup-id").innerText = id;
+        document.getElementById("popup-nome").innerText = nome;
+        document.getElementById("popup").classList.remove("hidden");
+    }
+
+    function fecharPopup() {
+        document.getElementById("popup").classList.add("hidden");
+    }
+</script>
+
+{% if sucesso %}
+<script>
+    abrirPopup("{{ categoria_id }}", "{{ categoria_nome }}");
+</script>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,39 @@
+{% load static %}
+<!----Retirada das tags para centralizar o fluxo de telas no base.html ---->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema Biblioteca{% endblock %}</title>
+
+    <!-- CSS global -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <!-- MENU LATERAL FIXO -->
+    <aside class="sidebar">
+        <h2>Sistema Biblioteca</h2>
+        <ul>
+          <li><a href="{% url 'tela_inicial' %}">🏠 Início</a></li>
+          <li><a href="{% url 'tela_todos_livros' %}">📚 Todos os Livros</a></li>
+          <li><a href="{% url 'livro-create' %}">➕ Adicionar Livro</a></li>
+          <li><a href="{% url 'autor-create' %}">➕ Adicionar Autor</a></li>
+
+          <li><a href="{% url 'categoria-create' %}">➕ Adicionar Categoria</a></li>
+          <li><a href="{% url 'editora-create' %}">➕ Adicionar Editora</a></li>
+          <li><a href="{% url 'login' %}">🚪 Logout</a></li> <!--Reciclei a url de login para o logout(Sim precisa de melhorias)--->
+
+        </ul>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>
