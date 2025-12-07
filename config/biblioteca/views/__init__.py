@@ -1,5 +1,6 @@
 """Exporta todas as views."""
 from .auth_views import (login_view, home)
+
 from .livro_views import (
     LivroCreateView, livro_list, RemoverLivroView,
     AssociarAutorView, AssociarCategoriaView

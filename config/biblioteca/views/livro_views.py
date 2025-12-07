@@ -102,7 +102,7 @@ def api_livro_detail(request, livro_id):
         print(f"IDs dos autores: {autores_ids}")
         
         # Busca categorias
-        categorias_ids = tbl_livro_categoria.objects.filter(livro=livro).values_list('categoria', flat=True)
+        categorias_ids = list(tbl_livro_categoria.objects.filter(livro=livro).values_list('categoria', flat=True))
         categorias = list(tbl_categoria.objects.filter(id_categoria__in=categorias_ids))
         categorias_nomes = ', '.join([cat.nome for cat in categorias]) if categorias else ''
         print(f"Categorias encontradas: {[c.nome for c in categorias]}")
@@ -131,10 +131,10 @@ def api_livro_detail(request, livro_id):
             'editora_id': livro.editora.id_editora if livro.editora else None,
             'autores': autores_nomes,  # String com nomes
             'autores_ids': autores_ids,  # Array de IDs para o Select2 (IMPORTANTE!)
-            'categoria': categorias_nomes,
-            'categoria_id': categoria_id,
-            'status': status_value,
-            'status_id': status_id
+            'categorias': categorias_nomes,
+            'categorias_ids': categorias_ids,
+            'status': livro.status.descricao if livro.status else '',
+            'status_id': livro.status.id_status if livro.status else None
         }
         
         # Adicionar datas com verificação segura
@@ -201,6 +201,7 @@ def api_livro_update(request, livro_id):
                 categoria_id = request.POST.get('categoria_id')
                 status_id = request.POST.get('status_id')
                 autores_ids_json = request.POST.get('autores_ids')
+                categorias_ids_json = request.POST.get('categorias_ids')
                 remove_capa = request.POST.get('remove_capa') == 'true'
                 
                 # Atualiza campos básicos
@@ -266,40 +267,33 @@ def api_livro_update(request, livro_id):
                     except json.JSONDecodeError as e:
                         print(f"Erro ao decodificar autores_ids: {e}")
                 
-                # Atualiza categorias
-                if categoria_id:
+                # Processa categorias
+                if categorias_ids_json:
                     try:
-                        categoria = tbl_categoria.objects.get(id_categoria=categoria_id)
+                        categorias_ids = json.loads(categorias_ids_json)
+                        print(f"DEBUG: Categorias recebidas: {categorias_ids}")
+                        
                         # Remove categorias existentes
                         tbl_livro_categoria.objects.filter(livro=livro).delete()
-                        # Adiciona nova categoria
-                        tbl_livro_categoria.objects.create(livro=livro, categoria=categoria)
-                    except tbl_categoria.DoesNotExist:
-                        return JsonResponse({
-                            'success': False, 
-                            'error': 'Categoria não encontrada'
-                        }, status=404)
+                        
+                        # Adiciona novas categorias
+                        if categorias_ids and len(categorias_ids) > 0:
+                            for categoria_id in categorias_ids:
+                                try:
+                                    categoria = tbl_categoria.objects.get(id_categoria=categoria_id)
+                                    tbl_livro_categoria.objects.create(livro=livro, categoria=categoria)
+                                    print(f"Categoria adicionada: {categoria.nome} (ID: {categoria_id})")
+                                except tbl_categoria.DoesNotExist:
+                                    print(f"Categoria ID {categoria_id} não encontrada, pulando...")
+                    except json.JSONDecodeError as e:
+                        print(f"Erro ao decodificar categorias_ids: {e}")
+                    except Exception as e:
+                        print(f"Erro ao processar categorias: {e}")
                 
             else:
                 # Processa JSON (modo antigo para compatibilidade)
                 data = json.loads(request.body)
                 print(f"Dados recebidos para atualização (JSON): {data}")
-                
-                # Atualiza campos básicos
-                if 'titulo' in data:
-                    livro.titulo = data['titulo']
-                if 'ano_publicacao' in data:
-                    livro.ano_publicacao = data['ano_publicacao']
-                if 'status_id' in data:
-                    try:
-                        status_obj = tbl_status_livro.objects.get(id_status=data['status_id'])
-                        livro.status = status_obj
-                        print(f"Status atualizado para: {status_obj.descricao} (ID: {status_obj.id_status})")
-                    except tbl_status_livro.DoesNotExist:
-                        return JsonResponse({
-                            'success': False, 
-                            'error': 'Status não encontrado'
-                        }, status=404)
                 
                 # Atualiza editora
                 if 'editora_id' in data and data['editora_id']:
@@ -332,37 +326,33 @@ def api_livro_update(request, livro_id):
                                 print(f"Autor ID {autor_id} não encontrado, pulando...")
                 
                 # Atualiza categorias
-                if 'categoria_id' in data and data['categoria_id']:
+                if 'categorias_ids' in data:
+                    print(f"Atualizando categorias: {data['categorias_ids']}")
+                    # Remove categorias existentes
+                    tbl_livro_categoria.objects.filter(livro=livro).delete()
+                    # Adiciona novas categorias
+                    if data['categorias_ids'] and len(data['categorias_ids']) > 0:
+                        for categoria_id in data['categorias_ids']:
+                            try:
+                                categoria = tbl_categoria.objects.get(id_categoria=categoria_id)
+                                tbl_livro_categoria.objects.create(livro=livro, categoria=categoria)
+                                print(f"Categoria adicionada: {categoria.nome} (ID: {categoria_id})")
+                            except tbl_categoria.DoesNotExist:
+                                print(f"Categoria ID {categoria_id} não encontrada, pulando...")
+                # Mantém compatibilidade com categoria_id singular
+                elif 'categoria_id' in data and data['categoria_id']:
                     try:
                         categoria = tbl_categoria.objects.get(id_categoria=data['categoria_id'])
-                        # Remove categorias existentes
                         tbl_livro_categoria.objects.filter(livro=livro).delete()
-                        # Adiciona nova categoria
                         tbl_livro_categoria.objects.create(livro=livro, categoria=categoria)
                     except tbl_categoria.DoesNotExist:
-                        return JsonResponse({
-                            'success': False, 
-                            'error': 'Categoria não encontrada'
-                        }, status=404)
+                        pass
             
-            return JsonResponse({
-                'success': True, 
-                'message': 'Livro atualizado com sucesso'
-            })
+            return JsonResponse({'success': True, 'message': 'Livro atualizado com sucesso'})
             
-        except json.JSONDecodeError:
-            return JsonResponse({
-                'success': False, 
-                'error': 'JSON inválido'
-            }, status=400)
         except Exception as e:
             print(f"Erro na atualização: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            return JsonResponse({
-                'success': False, 
-                'error': str(e)
-            }, status=500)
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 @csrf_exempt
