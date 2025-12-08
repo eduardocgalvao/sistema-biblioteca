@@ -1,18 +1,17 @@
+<!-- biblioteca/templates/categoria/categoria_form.html-->
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <!-- Título exibido na aba do navegador -->
-    <title>Adicionar Categoria</title>
+{% block title %}Adicionar Categoria{% endblock %}
 
     <!-- CSS reutilizado da página de editora -->
+{% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/categoria_form.css' %}" />
   </head>
+{% endblock %}
 
+{% block content %}
   <body>
     <!-- Botão para voltar para a tela inicial -->
     <a href="{% url 'home' %}" class="back-btn">←</a>
@@ -44,7 +43,9 @@
         </div>
       </form>
     </div>
+{% endblock %}
 
+{% block scripts %}
     <!-- POPUP de confirmação após salvar -->
     <div id="popup" class="popup hidden">
       <div class="popup-content">
@@ -78,5 +79,6 @@
       abrirPopup("{{ categoria_id }}", "{{ categoria_nome }}");
     </script>
     {% endif %}
+{% endblock %}
   </body>
 </html>

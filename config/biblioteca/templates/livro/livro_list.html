@@ -1,15 +1,12 @@
+<!-- biblioteca/templates/livro/livro_list.html -->
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Todos os Livros - BookStack</title>
+{% block title %}Todos os Livros - BookStack{% endblock %}
 
+{% block extra_css %}
     <!-- Estilos principais do layout -->
     <link rel="stylesheet" href="{% static 'css/livro_list.css' %}" />
-
     <!-- Fonte usada em todo o sistema -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,7 +15,9 @@
     <!-- Estilos da biblioteca Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
+{% endblock %}
 
+{% block content %}
 <body>
     <div class="livros-container">
 
@@ -240,7 +239,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
 
+{% block scripts %}
     <!-- Bibliotecas externas -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -271,6 +272,7 @@
     
     <!-- 6. Eventos principais -->
     <script src="{% static 'js/livro/eventos.js' %}"></script>
+{% endblock %}
 
 </body>
 </html>
