@@ -49,7 +49,10 @@ admin.site.register(models.tbl_status_livro)
 # Descrição: Tabela principal que armazena informações dos livros
 # Campos: id_livro, isbn, titulo, ano_publicacao, editora_id, status_id, dt_criacao, dt_atualizacao
 # Relacionamentos: ManyToMany com tbl_autor e tbl_categoria
-admin.site.register(models.tbl_livro)
+@admin.register(models.tbl_livro)
+class LivroAdmin(admin.ModelAdmin):
+    # Exibe o campo status, porém não é editável
+    readonly_fields = ('status',)
 
 # Modelo: tbl_livro_autor
 # Descrição: Tabela de associação (Many-to-Many) entre livros e autores

@@ -60,8 +60,9 @@ class tbl_livro(models.Model):
     isbn = models.CharField(max_length=20)
     titulo = models.CharField(max_length=255)
     ano_publicacao = models.IntegerField()
+    quantidade = models.IntegerField(default=0)
     editora = models.ForeignKey(tbl_editora, on_delete=models.PROTECT)
-    status = models.ForeignKey(tbl_status_livro, on_delete=models.PROTECT)
+    status = models.ForeignKey(tbl_status_livro, on_delete=models.PROTECT, )
     capa = models.ImageField(
         upload_to=livro_capa_upload_path, 
         null=True, 
@@ -72,6 +73,16 @@ class tbl_livro(models.Model):
     categorias = models.ManyToManyField(tbl_categoria, through="tbl_livro_categoria")
     dt_criacao = models.DateTimeField(auto_now_add=True)
     dt_atualizacao = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        # Atualiza o status automaticamente baseado na quantidade
+
+        if self.quantidade > 0:
+            self.status = tbl_status_livro.objects.get(descricao="Disponível")
+        else:
+            self.status = tbl_status_livro.objects.get(descricao="Indisponível")
+
+        super().save(*args, **kwargs)
 
 
 class tbl_livro_autor(models.Model):

@@ -21,7 +21,7 @@ class LivroCreateForm(forms.ModelForm):
             "ano_publicacao": forms.NumberInput(attrs={"class": "input-field"}),
             "capa": forms.ClearableFileInput(attrs={"accept": "image/*"}),
             "editora": forms.Select(attrs={"class": "single-select"}),
-            "status": forms.Select(attrs={"class": "single-select"}),
+            "quantidade": forms.NumberInput(attrs={"class": "input-field"}),
             "autores": Select2MultipleWidget(attrs={"class": "multi-select"}),
             "categorias": Select2MultipleWidget(attrs={"class": "multi-select"}),
         }
