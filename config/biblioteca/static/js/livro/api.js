@@ -39,11 +39,12 @@ async function updateLivro(id, data, isFormData = false) {
     console.log(`Atualizando livro ID: ${id}`);
     
     try {
+        const metodoEnvio = isFormData ? 'POST' : 'PUT';
         const url = `/api/livro/${id}/update/`;
         console.log("URL:", url);
         
         let requestOptions = {
-            method: 'PUT',
+            method: metodoEnvio,
             headers: {
                 'X-CSRFToken': window.csrftoken,
             }

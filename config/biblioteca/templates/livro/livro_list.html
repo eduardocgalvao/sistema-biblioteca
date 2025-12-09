@@ -45,6 +45,7 @@
                         <th>Status</th>
                         <th>Autores</th>
                         <th>Categorias</th>
+                        <th>Quantidade</th>
                         <th>Criado em</th>
                         <th>Atualizado em</th>
                     </tr>
@@ -97,10 +98,15 @@
                                 {{ categoria.nome }}{% if not forloop.last %}, {% endif %}
                             {% empty %}-{% endfor %}
                         </td>
+                        <td>{{livro.quantidade|default:"0"}} </td>
 
                         <!-- Datas -->
                         <td>{{ livro.dt_criacao|date:"d/m/Y"|default:"-" }}</td>
                         <td>{{ livro.dt_atualizacao|date:"d/m/Y"|default:"-" }}</td>
+
+                        
+                            
+                      
                     </tr>
 
                     {% endwith %}
@@ -133,7 +139,7 @@
                     <!-- Título -->
                     <div class="campo">
                         <label for="edit-titulo">Título *</label>
-                        <input type="text" id="edit-titulo" name="titulo" required />
+                        <input type="text" id="edit-titulo" name="titulo" />
                     </div>
 
                     <!-- Editora -->
@@ -163,16 +169,7 @@
                         </select>
                     </div>
 
-                    <!-- Status -->
-                    <div class="campo">
-                        <label for="edit-status">Status *</label>
-                        <select id="edit-status" name="status_id" required>
-                            <option value="">Selecione...</option>
-                            {% for status in status_list %}
-                                <option value="{{ status.id_status }}">{{ status.descricao|title }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                    <input type="hidden" id="edit-status" name="status_id">
 
                     <!-- Autores (Select2) -->
                     <div class="campo">
@@ -183,6 +180,11 @@
                             {% endfor %}
                         </select>
                     </div>
+                </div>
+                <!-- Campo de quantidade -->
+                <div class="campo">
+                    <label for="edit-quantidade">Quantidade</label>
+                    <input type="number" id="edit-quantidade" name="quantidade" min="0" max="2000">
                 </div>
 
                 <!-- Área de capa -->

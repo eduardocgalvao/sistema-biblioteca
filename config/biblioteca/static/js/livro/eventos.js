@@ -32,8 +32,11 @@ function setupEventListeners() {
                 document.getElementById("edit-titulo").value = livro.titulo || '';
                 document.getElementById("edit-editora").value = livro.editora_id || '';
                 document.getElementById("edit-ano").value = livro.ano_publicacao || '';
+                if(document.getElementById("edit-quantidade")) {
+                    document.getElementById("edit-quantidade").value = livro.quantidade || '';
+                };
                 //document.getElementById("edit-categoria").value = livro.categoria_id || '';
-                document.getElementById("edit-status").value = livro.status_id || '';
+                
                 
                 // Inicializa Select2 se ainda não foi
                 if (window.inicializarSelect2Autores) {
@@ -114,6 +117,58 @@ function setupEventListeners() {
         });
     });
 
+    // ========== EVENTO: MUDANÇA NA CAPA (PREVIEW E CAPTURA) ==========
+    const capaInput = document.getElementById('edit-capa');
+    const removeCapaCheckbox = document.getElementById('remove-capa');
+    const previewImg = document.getElementById('capa-preview-img');
+    const placeholder = document.getElementById('capa-placeholder');
+
+    if (capaInput){
+        capaInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+
+            if(file) {
+                // Salva arquivo na variável global
+                window.novaCapaFile = file;
+                console.log("Arquivo selecionado", file.name);
+
+                // Cria o preview da imagem
+                const reader = new FileReader();
+                reader.onload = function(e){
+                    if (previewImg) {
+                        previewImg.src = e.target.result;
+                        previewImg.style.display = 'block';
+
+                    }
+                    if (placeholder) placeholder.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+
+                if (removeCapaCheckbox) removeCapaCheckbox.checked = false;
+            }
+        });
+    }
+
+    if (removeCapaCheckbox) {
+        removeCapaCheckbox.addEventListener('change', function(){
+            if (this.checked) {
+                if (previewImg) previewImg.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'flex';
+
+                if (capaInput) capaInput.value = '';
+                window.novaCapaFile = null;
+                console.log("Marcou para remover capa");
+            } else {
+                
+                if (window.capaOriginalUrl && previewImg) {
+                    previewImg.src = window.capaOriginalUrl;
+                    previewImg.style.display = 'block';
+                    if (placeholder) placeholder.style.display = 'none';
+                }
+            }
+        });
+    }
+
     // ========== EVENTO: SUBMIT DO FORMULÁRIO DE EDIÇÃO ==========
     const editForm = document.getElementById("edit-form");
     if (editForm) {
@@ -150,8 +205,9 @@ function setupEventListeners() {
                 formData.append('titulo', document.getElementById("edit-titulo").value);
                 formData.append('editora_id', document.getElementById("edit-editora").value);
                 formData.append('ano_publicacao', document.getElementById("edit-ano").value);
+                formData.append('quantidade', document.getElementById('edit-quantidade').value);
                 //formData.append('categoria_id', document.getElementById("edit-categoria").value);
-                formData.append('status_id', document.getElementById("edit-status").value);
+                
                 
                 // Adiciona autores como JSON string
                 formData.append('autores_ids', JSON.stringify(autoresSelecionados));
@@ -181,7 +237,7 @@ function setupEventListeners() {
                     editora_id: document.getElementById("edit-editora").value,
                     ano_publicacao: document.getElementById("edit-ano").value,
                     categoria_id: document.getElementById("edit-categoria").value,
-                    status_id: document.getElementById("edit-status").value,
+                    quantidade: document.getElementById("edit-quantidade").value,
                     autores_ids: autoresSelecionados,
                     categorias_ids: categoriasSelecionadas
                 };

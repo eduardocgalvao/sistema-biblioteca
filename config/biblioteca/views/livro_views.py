@@ -44,6 +44,7 @@ class LivroCreateView(View):
             "sucesso": True,
             "livro_id": livro.id_livro,
             "livro_nome": livro.titulo,
+            "livro_quantidade": livro.quantidade,
             "livro_capa": livro.capa.url if livro.capa else None
         })
 
@@ -181,178 +182,118 @@ def api_livro_detail(request, livro_id):
 
 
 @csrf_exempt
-@require_http_methods(["PUT"])
+@require_http_methods(["PUT", "POST"])
 def api_livro_update(request, livro_id):
-    """API para atualizar um livro."""
-    if request.method == 'PUT':
+    if request.method == 'POST' or request.method == 'PUT':
         try:
             livro = get_object_or_404(tbl_livro, id_livro=livro_id)
             
-            # Verifica se é multipart/form-data (com arquivo)
+            # 1. UNIFICAÇÃO DOS DADOS (O Segredo para corrigir o erro)
+            # Inicializamos 'data' vazia e preenchemos conforme o tipo de envio
+            data = {}
+            files = {}
+
             if request.content_type.startswith('multipart/form-data'):
-                print("DEBUG: Recebendo dados multipart/form-data")
-                print(f"POST data: {dict(request.POST)}")
-                print(f"FILES data: {dict(request.FILES)}")
-                
-                # Processa campos do formulário
-                titulo = request.POST.get('titulo')
-                ano_publicacao = request.POST.get('ano_publicacao')
-                editora_id = request.POST.get('editora_id')
-                categoria_id = request.POST.get('categoria_id')
-                status_id = request.POST.get('status_id')
-                autores_ids_json = request.POST.get('autores_ids')
-                categorias_ids_json = request.POST.get('categorias_ids')
-                remove_capa = request.POST.get('remove_capa') == 'true'
-                
-                # Atualiza campos básicos
-                if titulo:
-                    livro.titulo = titulo
-                if ano_publicacao:
-                    livro.ano_publicacao = ano_publicacao
-                
-                # Atualiza status
-                if status_id:
-                    try:
-                        status_obj = tbl_status_livro.objects.get(id_status=status_id)
-                        livro.status = status_obj
-                        print(f"Status atualizado para: {status_obj.descricao} (ID: {status_obj.id_status})")
-                    except tbl_status_livro.DoesNotExist:
-                        return JsonResponse({
-                            'success': False, 
-                            'error': 'Status não encontrado'
-                        }, status=404)
-                
-                # Atualiza editora
-                if editora_id:
-                    try:
-                        editora = tbl_editora.objects.get(id_editora=editora_id)
-                        livro.editora = editora
-                    except tbl_editora.DoesNotExist:
-                        return JsonResponse({
-                            'success': False, 
-                            'error': 'Editora não encontrada'
-                        }, status=404)
-                
-                # Processa a capa
-                if 'capa' in request.FILES:
-                    print("DEBUG: Nova capa recebida")
-                    livro.capa = request.FILES['capa']
-                elif remove_capa and livro.capa:
-                    print("DEBUG: Removendo capa atual")
-                    livro.capa.delete(save=False)  # Remove o arquivo
-                    livro.capa = None  # Limpa o campo
-                
-                # Salva o livro (isso salva a imagem também)
-                livro.save()
-                print(f"Livro {livro_id} salvo.")
-                
-                # Processa autores
-                if autores_ids_json:
-                    try:
-                        autores_ids = json.loads(autores_ids_json)
-                        print(f"DEBUG: Autores recebidos: {autores_ids}")
-                        
-                        # Remove autores existentes
-                        tbl_livro_autor.objects.filter(livro=livro).delete()
-                        
-                        # Adiciona novos autores
-                        if autores_ids and len(autores_ids) > 0:
-                            for autor_id in autores_ids:
-                                try:
-                                    autor = tbl_autor.objects.get(id_autor=autor_id)
-                                    tbl_livro_autor.objects.create(livro=livro, autor=autor)
-                                    print(f"Autor adicionado: {autor.nome} (ID: {autor_id})")
-                                except tbl_autor.DoesNotExist:
-                                    print(f"Autor ID {autor_id} não encontrado, pulando...")
-                    except json.JSONDecodeError as e:
-                        print(f"Erro ao decodificar autores_ids: {e}")
-                
-                # Processa categorias
-                if categorias_ids_json:
-                    try:
-                        categorias_ids = json.loads(categorias_ids_json)
-                        print(f"DEBUG: Categorias recebidas: {categorias_ids}")
-                        
-                        # Remove categorias existentes
-                        tbl_livro_categoria.objects.filter(livro=livro).delete()
-                        
-                        # Adiciona novas categorias
-                        if categorias_ids and len(categorias_ids) > 0:
-                            for categoria_id in categorias_ids:
-                                try:
-                                    categoria = tbl_categoria.objects.get(id_categoria=categoria_id)
-                                    tbl_livro_categoria.objects.create(livro=livro, categoria=categoria)
-                                    print(f"Categoria adicionada: {categoria.nome} (ID: {categoria_id})")
-                                except tbl_categoria.DoesNotExist:
-                                    print(f"Categoria ID {categoria_id} não encontrada, pulando...")
-                    except json.JSONDecodeError as e:
-                        print(f"Erro ao decodificar categorias_ids: {e}")
-                    except Exception as e:
-                        print(f"Erro ao processar categorias: {e}")
-                
+                # Se veio do FormData (com ou sem imagem)
+                data = request.POST.dict() # Converte para dicionário Python normal
+                files = request.FILES
             else:
-                # Processa JSON (modo antigo para compatibilidade)
-                data = json.loads(request.body)
-                print(f"Dados recebidos para atualização (JSON): {data}")
-                
-                # Atualiza editora
-                if 'editora_id' in data and data['editora_id']:
-                    try:
-                        editora = tbl_editora.objects.get(id_editora=data['editora_id'])
-                        livro.editora = editora
-                    except tbl_editora.DoesNotExist:
-                        return JsonResponse({
-                            'success': False, 
-                            'error': 'Editora não encontrada'
-                        }, status=404)
-                
-                # Salva o livro
-                livro.save()
-                print(f"Livro {livro_id} salvo.")
-                
-                # Atualiza autores
-                if 'autores_ids' in data:
-                    print(f"Atualizando autores: {data['autores_ids']}")
-                    # Remove autores existentes
-                    tbl_livro_autor.objects.filter(livro=livro).delete()
-                    # Adiciona novos autores
-                    if data['autores_ids'] and len(data['autores_ids']) > 0:
-                        for autor_id in data['autores_ids']:
-                            try:
-                                autor = tbl_autor.objects.get(id_autor=autor_id)
-                                tbl_livro_autor.objects.create(livro=livro, autor=autor)
-                                print(f"Autor adicionado: {autor.nome} (ID: {autor_id})")
-                            except tbl_autor.DoesNotExist:
-                                print(f"Autor ID {autor_id} não encontrado, pulando...")
-                
-                # Atualiza categorias
-                if 'categorias_ids' in data:
-                    print(f"Atualizando categorias: {data['categorias_ids']}")
-                    # Remove categorias existentes
-                    tbl_livro_categoria.objects.filter(livro=livro).delete()
-                    # Adiciona novas categorias
-                    if data['categorias_ids'] and len(data['categorias_ids']) > 0:
-                        for categoria_id in data['categorias_ids']:
-                            try:
-                                categoria = tbl_categoria.objects.get(id_categoria=categoria_id)
-                                tbl_livro_categoria.objects.create(livro=livro, categoria=categoria)
-                                print(f"Categoria adicionada: {categoria.nome} (ID: {categoria_id})")
-                            except tbl_categoria.DoesNotExist:
-                                print(f"Categoria ID {categoria_id} não encontrada, pulando...")
-                # Mantém compatibilidade com categoria_id singular
-                elif 'categoria_id' in data and data['categoria_id']:
-                    try:
-                        categoria = tbl_categoria.objects.get(id_categoria=data['categoria_id'])
-                        tbl_livro_categoria.objects.filter(livro=livro).delete()
-                        tbl_livro_categoria.objects.create(livro=livro, categoria=categoria)
-                    except tbl_categoria.DoesNotExist:
-                        pass
+                # Se veio JSON puro
+                try:
+                    data = json.loads(request.body)
+                except:
+                    data = {}
+
+            print(f"DEBUG: Dados processados: {data}")
+
+            # 2. ATUALIZAÇÃO DOS CAMPOS BÁSICOS (Funciona para os dois casos agora)
+            # Usamos .get() para pegar o valor novo ou manter o antigo se não vier nada
             
-            return JsonResponse({'success': True, 'message': 'Livro atualizado com sucesso'})
+            if 'titulo' in data:
+                livro.titulo = data['titulo']
             
+            if 'ano_publicacao' in data:
+                livro.ano_publicacao = data['ano_publicacao']
+                
+            # Tratamento especial para quantidade (int)
+            if 'quantidade' in data:
+                qtde = data['quantidade']
+                if qtde is not None and qtde != '':
+                    livro.quantidade = qtde
+
+            # Atualiza Editora
+            if 'editora_id' in data and data['editora_id']:
+                try:
+                    livro.editora = tbl_editora.objects.get(id_editora=data['editora_id'])
+                except tbl_editora.DoesNotExist:
+                    return JsonResponse({'success': False, 'error': 'Editora inválida'}, status=404)
+
+            # 3. ATUALIZAÇÃO DA IMAGEM (CAPA)
+            # Verifica se veio arquivo físico ou flag de remoção
+            if 'capa' in files:
+                print("DEBUG: Salvando nova capa...")
+                livro.capa = files['capa']
+            elif data.get('remove_capa') == 'true':
+                print("DEBUG: Removendo capa...")
+                if livro.capa:
+                    livro.capa.delete(save=False)
+                livro.capa = None
+
+            # 4. SALVA O LIVRO (Básico + Capa)
+            livro.save()
+            print(f"Livro {livro_id} salvo com sucesso.")
+
+            # 5. ATUALIZAÇÃO MANY-TO-MANY (Autores e Categorias)
+            # Função auxiliar para não repetir código
+            def atualizar_relacao(campo_ids, model_relacao, model_destino, campo_destino_str):
+                # Tenta pegar a lista de IDs
+                ids_raw = data.get(campo_ids)
+                
+                # Se veio do FormData, pode vir como string "[1, 2]"
+                if isinstance(ids_raw, str):
+                    try:
+                        ids_list = json.loads(ids_raw)
+                    except:
+                        # Se não for JSON, pode ser um ID único string "1"
+                        ids_list = [int(ids_raw)] if ids_raw.isdigit() else []
+                # Se veio do JSON puro, já é lista [1, 2]
+                elif isinstance(ids_raw, list):
+                    ids_list = ids_raw
+                else:
+                    ids_list = []
+
+                if ids_list is not None:
+                    # Limpa relações antigas
+                    model_relacao.objects.filter(livro=livro).delete()
+                    
+                    # Cria novas
+                    for obj_id in ids_list:
+                        try:
+                            # Monta o filtro dinâmico (id_autor=1 ou id_categoria=1)
+                            kwargs_get = {f'id_{campo_destino_str}': obj_id}
+                            obj_destino = model_destino.objects.get(**kwargs_get)
+                            
+                            # Monta a criação dinâmica
+                            kwargs_create = {'livro': livro, campo_destino_str: obj_destino}
+                            model_relacao.objects.create(**kwargs_create)
+                        except Exception as e:
+                            print(f"Erro ao vincular {campo_destino_str} {obj_id}: {e}")
+
+            # Executa para Autores
+            atualizar_relacao('autores_ids', tbl_livro_autor, tbl_autor, 'autor')
+            
+            # Executa para Categorias
+            atualizar_relacao('categorias_ids', tbl_livro_categoria, tbl_categoria, 'categoria')
+
+            return JsonResponse({'success': True, 'message': 'Livro atualizado!'})
+
         except Exception as e:
-            print(f"Erro na atualização: {str(e)}")
+            print(f"ERRO CRÍTICO: {str(e)}")
+            import traceback
+            traceback.print_exc() # Isso mostra a linha exata do erro no terminal
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'error': 'Método inválido'}, status=405)
 
 
 @csrf_exempt

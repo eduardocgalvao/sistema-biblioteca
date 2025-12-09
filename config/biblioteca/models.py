@@ -75,6 +75,13 @@ class tbl_livro(models.Model):
     dt_atualizacao = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
+
+        
+        if self.quantidade is not None:
+            try:
+                self.quantidade = int(self.quantidade)
+            except ValueError:
+                self.quantidade = 0
         # Atualiza o status automaticamente baseado na quantidade
 
         if self.quantidade > 0:
