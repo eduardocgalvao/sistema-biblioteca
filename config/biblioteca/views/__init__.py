@@ -1,6 +1,11 @@
 """Exporta todas as views."""
 
-from .emprestimo_views import (buscar_alunos, emprestimo_list, registrar_emprestimo)
+from .emprestimo_views import (
+    buscar_alunos,
+    registrar_emprestimo,
+    registrar_devolucao
+)
+
 
 from .auth_views import (login_view, home, registro_view)
 

@@ -42,7 +42,7 @@ from .views import (
     registro_view,
     buscar_alunos, 
     registrar_emprestimo, 
-    emprestimo_list
+    # emprestimo_list
 )
 
 urlpatterns = [
@@ -66,7 +66,7 @@ urlpatterns = [
     # EMPRÉSTIMOS
     path('emprestimo/registrar/', registrar_emprestimo, name='registrar_emprestimo'),
     path('emprestimo/buscar-alunos/', buscar_alunos, name='buscar_alunos'),
-    path('emprestimos/', emprestimo_list, name='emprestimo-list'),
+    # path('emprestimos/', emprestimo_list, name='emprestimo-list'),
     
     # AUTORES
     path("autores/", AutorListView.as_view(), name="autor-list"),
