@@ -16,6 +16,8 @@
             <h1>Autores cadastrados</h1>
         </header>
 
+        <button type="button" class="btn-create" data-action="create" title="Cadastrar">Cadastrar Autor</button>
+
         <main class="card-tabela">
             <table class="tabela-autores">
                 <thead>
@@ -104,6 +106,12 @@ document.addEventListener('DOMContentLoaded', function(){
 
     function openModal(modal){ modal.classList.remove('hidden'); modal.setAttribute('aria-hidden','false'); }
     function closeModal(modal){ modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true'); }
+
+    // Botão de criação (fora da grade) redireciona para a view de criação
+    const createBtn = document.querySelector('.btn-create');
+    if(createBtn){
+        createBtn.addEventListener('click', function(){ window.location.href = '{% url "autor-create" %}'; });
+    }
 
     document.querySelector('.tabela-autores').addEventListener('click', function(e){
         const btn = e.target.closest('button');

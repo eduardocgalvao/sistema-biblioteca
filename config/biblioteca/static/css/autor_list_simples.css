@@ -48,18 +48,37 @@ body{
     font-weight: 600;
 }
 
+/* Ajuste para empurrar o botão para a direita */
+.top-bar h1{ flex: 1; text-align: left; }
+
+.btn-cadastrar{
+    background: #0b5cff;
+    color: #2133d8;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(11,92,255,0.08);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    margin-left: auto;
+}
+.btn-cadastrar:hover{ transform: translateY(-2px); box-shadow: 0 8px 24px rgba(11,92,255,0.12); }
+
 .card-tabela{
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 12px;
     box-shadow: 0 1px 0 rgba(16,24,40,0.03);
+    
 }
 
 .tabela-autores{
     width: 100%;
     border-collapse: collapse;
     table-layout: auto;
+   
+    
 }
 
 .tabela-autores thead th{
@@ -68,6 +87,7 @@ body{
     color: var(--muted);
     padding: 10px 12px;
     border-bottom: 1px solid var(--border);
+   
 }
 
 .tabela-autores tbody td{
@@ -101,6 +121,27 @@ body{
     border-radius: 6px;
     font-size: 14px;
 }
+
+.btn-create{
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    border: none;
+    text-align: center;
+    background-color: #019c99;
+    color: #ffffff;
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 1200;
+    box-shadow: 0 8px 24px rgba(11,92,255,0.12);
+}
+.btn-create:hover{ transform: translateY(-2px); }
+.btn-create:hover{ transform: translateY(-2px); }
+
 .btn-edit{ color: #0b5cff; }
 .btn-edit:hover{ background: rgba(11,92,255,0.06); }
 .btn-delete{ color: #dc2626; }
