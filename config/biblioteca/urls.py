@@ -39,11 +39,14 @@ from .views import (
     MotivoRemocaoUpdateView,
     MotivoRemocaoDeleteView,
     home,
+    registro_view,
 )
 
 urlpatterns = [
     # LOGIN
     path("", login_view, name="login"),
+    path("registro/", registro_view, name="registro"),
+
     
     # TELA INICIAL
     path('home/', home, name='home'),
