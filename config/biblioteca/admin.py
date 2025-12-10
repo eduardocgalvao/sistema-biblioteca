@@ -1,82 +1,54 @@
-"""
-========================================
-ADMIN.PY - Configuração do Django Admin
-========================================
-
-Arquivo responsável por registrar os modelos da aplicação 'biblioteca'
-no painel administrativo do Django (Django Admin).
-
-Cada modelo registrado pode ser gerenciado através da interface web
-do Django Admin, permitindo criar, ler, atualizar e deletar registros
-de forma intuitiva.
-
-Nota: Para customizações avançadas (filtros, busca, paginação, etc),
-utilize ModelAdmin classes customizadas conforme necessário.
-"""
-
-# Importa o módulo admin do Django para registrar modelos
 from django.contrib import admin
-
-# Importa todos os modelos definidos em models.py
 from . import models
 
 
-# ========================================
-# REGISTROS DE MODELOS
-# ========================================
+@admin.register(models.tbl_editora)
+class EditoraAdmin(admin.ModelAdmin):
+    list_display = ("nome", "cidade")
+    search_fields = ("nome", "cidade")
 
-# Modelo: tbl_editora
-# Descrição: Tabela que armazena informações das editoras de livros
-# Campos: id_editora, nome, endereco, cidade
-admin.site.register(models.tbl_editora)
 
-# Modelo: tbl_autor
-# Descrição: Tabela que armazena informações dos autores de livros
-# Campos: id_autor, nome, sobrenome
-admin.site.register(models.tbl_autor)
+@admin.register(models.tbl_autor)
+class AutorAdmin(admin.ModelAdmin):
+    list_display = ("nome", "sobrenome")
+    search_fields = ("nome", "sobrenome")
 
-# Modelo: tbl_categoria
-# Descrição: Tabela que armazena as categorias/gêneros de livros
-# Campos: id_categoria, nome
-admin.site.register(models.tbl_categoria)
 
-# Modelo: tbl_status_livro
-# Descrição: Tabela que define os possíveis status de um livro (ativo, inativo, removido, etc)
-# Campos: id_status, descricao
-admin.site.register(models.tbl_status_livro)
+@admin.register(models.tbl_categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ("nome",)
 
-# Modelo: tbl_livro
-# Descrição: Tabela principal que armazena informações dos livros
-# Campos: id_livro, isbn, titulo, ano_publicacao, editora_id, status_id, dt_criacao, dt_atualizacao
-# Relacionamentos: ManyToMany com tbl_autor e tbl_categoria
+
+@admin.register(models.tbl_status_livro)
+class StatusLivroAdmin(admin.ModelAdmin):
+    list_display = ("descricao", "ativo")
+
+
 @admin.register(models.tbl_livro)
 class LivroAdmin(admin.ModelAdmin):
-    # Exibe o campo status, porém não é editável
-    readonly_fields = ('status',)
+    list_display = ("titulo", "isbn", "ano_publicacao", "quantidade", "editora", "status")
+    search_fields = ("titulo", "isbn")
+    list_filter = ("status", "editora")
+    readonly_fields = ("status",)
 
-# Modelo: tbl_livro_autor
-# Descrição: Tabela de associação (Many-to-Many) entre livros e autores
-# Permite que um livro tenha múltiplos autores e um autor multiple livros
+
 admin.site.register(models.tbl_livro_autor)
-
-# Modelo: tbl_livro_categoria
-# Descrição: Tabela de associação (Many-to-Many) entre livros e categorias
-# Permite que um livro pertença a múltiplas categorias
 admin.site.register(models.tbl_livro_categoria)
 
-# Modelo: tbl_usuario
-# Descrição: Tabela que armazena informações dos usuários do sistema
-# Campos: id_usuario, nome, sobrenome, email
-admin.site.register(models.tbl_usuario)
 
-# Modelo: tbl_motivo_remocao
-# Descrição: Tabela que define os motivos pelos quais um livro pode ser removido
-# Campos: id_motivo, descricao
-admin.site.register(models.tbl_motivo_remocao)
+@admin.register(models.tbl_usuario)
+class UsuarioAdmin(admin.ModelAdmin):
+    list_display = ("email", "nome", "sobrenome", "is_staff", "is_active")
+    search_fields = ("email", "nome")
 
-# Modelo: tbl_livro_remocao
-# Descrição: Tabela que registra o histórico de remoções de livros do acervo
-# Campos: id_remocao, livro_id, motivo_id, dt_remocao, removido_por_id
-# Relacionamentos: ForeignKey com tbl_livro, tbl_motivo_remocao e tbl_usuario
-admin.site.register(models.tbl_livro_remocao)
 
+@admin.register(models.Aluno)
+class AlunoAdmin(admin.ModelAdmin):
+    list_display = ("nome", "sobrenome", "matricula", "ativo")
+    search_fields = ("nome", "matricula")
+
+
+@admin.register(models.Emprestimo)
+class EmprestimoAdmin(admin.ModelAdmin):
+    list_display = ("livro", "aluno", "dt_emprestimo", "status")
+    list_filter = ("status",)

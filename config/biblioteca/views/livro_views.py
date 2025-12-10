@@ -7,7 +7,9 @@ from django.views import View
 import json
 from ..forms import LivroCreateForm, LivroAutorForm, LivroCategoriaForm
 from ..models import tbl_livro, tbl_livro_autor, tbl_livro_categoria, tbl_editora, tbl_autor, tbl_categoria, tbl_status_livro
-
+from biblioteca.models import Emprestimo
+from django.utils import timezone
+from datetime import timedelta, date, datetime
 
 class LivroCreateView(View):
     template_name = "livro/livro_form.html"
@@ -47,38 +49,45 @@ class LivroCreateView(View):
             "livro_quantidade": livro.quantidade,
             "livro_capa": livro.capa.url if livro.capa else None
         })
-
-
-def livro_list(request):
-    """Exibe uma lista de todos os livros disponíveis na biblioteca."""
-    livros = tbl_livro.objects.all().select_related('editora', 'status')
     
+def livro_list(request):
+    livros = tbl_livro.objects.all().select_related(
+        'editora', 'status'
+    ).prefetch_related(
+        'autores', 'categorias'
+    ).order_by('-dt_criacao')
+    
+    # Calcular disponibilidade para cada livro
     livros_com_relacionados = []
     for livro in livros:
-        # Busca autores
-        autores_ids = tbl_livro_autor.objects.filter(livro=livro).values_list('autor', flat=True)
-        autores = tbl_autor.objects.filter(id_autor__in=autores_ids)
+        # Contar empréstimos ativos
+        emprestados_ativos = Emprestimo.objects.filter(
+            livro=livro,
+            status='Disponível'
+        ).count()
         
-        # Busca categorias
-        categorias_ids = tbl_livro_categoria.objects.filter(livro=livro).values_list('categoria', flat=True)
-        categorias = tbl_categoria.objects.filter(id_categoria__in=categorias_ids)
+        # Calcular disponível
+        disponivel = (livro.quantidade or 0) - emprestados_ativos
         
         livros_com_relacionados.append({
             'livro': livro,
-            'autores': autores,
-            'categorias': categorias
+            'autores': list(livro.autores.all()),
+            'categorias': list(livro.categorias.all()),
+            'disponivel': max(0, disponivel)  # Não permite negativo
         })
     
-    todas_categorias = tbl_categoria.objects.all()
-    todas_editoras = tbl_editora.objects.all()
-    todos_autores = tbl_autor.objects.all()
+    # Outros dados para o template
+    editoras = tbl_editora.objects.all()
+    categorias = tbl_categoria.objects.all()
+    autores = tbl_autor.objects.all()
     
     return render(request, 'livro/livro_list.html', {
         'livros_com_relacionados': livros_com_relacionados,
-        'categorias': todas_categorias,
-        'editoras': todas_editoras,
-        'autores': todos_autores,
-        "status_list": tbl_status_livro.objects.filter(ativo=True)
+        'editoras': editoras,
+        'categorias': categorias,
+        'autores': autores,
+        'hoje': timezone.now().date(),
+        'data_padrao': timezone.now().date() + timedelta(days=10)
     })
 
 

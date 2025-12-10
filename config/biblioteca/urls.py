@@ -40,6 +40,9 @@ from .views import (
     MotivoRemocaoDeleteView,
     home,
     registro_view,
+    buscar_alunos, 
+    registrar_emprestimo, 
+    emprestimo_list
 )
 
 urlpatterns = [
@@ -59,6 +62,11 @@ urlpatterns = [
     # LIVROS
     path("livro/novo/", LivroCreateView.as_view(), name="livro-create"),
     path("livro/list/", livro_list, name="livro-list"),
+    
+    # EMPRÉSTIMOS
+    path('emprestimo/registrar/', registrar_emprestimo, name='registrar_emprestimo'),
+    path('emprestimo/buscar-alunos/', buscar_alunos, name='buscar_alunos'),
+    path('emprestimos/', emprestimo_list, name='emprestimo-list'),
     
     # AUTORES
     path("autores/", AutorListView.as_view(), name="autor-list"),

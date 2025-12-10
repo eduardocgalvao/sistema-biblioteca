@@ -1,4 +1,7 @@
 """Exporta todas as views."""
+
+from .emprestimo_views import (buscar_alunos, emprestimo_list, registrar_emprestimo)
+
 from .auth_views import (login_view, home, registro_view)
 
 from .livro_views import (
@@ -27,7 +30,7 @@ from .outros_views import (
 
 # Exportações gerais
 __all__ = [
-    'login_view', 'home', 'registro_view','livro_list',
+    'biblioteca.views','login_view', 'home', 'registro_view','livro_list',
     'LivroCreateView', 'RemoverLivroView',
     'AssociarAutorView', 'AssociarCategoriaView',
     'AutorListView', 'AutorCreateView', 'AutorUpdateView', 'AutorDeleteView',
