@@ -5,17 +5,17 @@
 {% block title %}Adicionar Autor - BookStack{% endblock %} {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/autor_form.css' %}" />
 {% endblock %} {% block content %}
-<!-- Botão para voltar à página inicial -->
-<a href="{% url 'home' %}" class="back-btn">←</a>
 
 <div class="pagina">
   <div class="cabecalho-livro">
     <img
-      src="{% static 'img/logo.png' %}"
-      class="logo-site"
-      alt="Logo BookStack"
+    src="{% static 'img/logo.png' %}"
+    class="logo-site"
+    alt="Logo BookStack"
     />
     <h1>Adicione um Novo Autor</h1>
+    <!-- Botão para voltar à página inicial -->
+    <a href="{% url 'home' %}" class="back-btn">←</a>
   </div>
 
   <div class="card-form">

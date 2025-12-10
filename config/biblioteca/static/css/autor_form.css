@@ -15,7 +15,7 @@ body {
 
 .back-btn {
     position: absolute;
-    top: 25px;
+    top: 0;
     left: 30px;
     font-size: 26px;
     text-decoration: none;
@@ -47,6 +47,7 @@ body {
     margin-bottom: 40px;
     color: #004A46;
     width: 100%;
+    position: relative;
 }
 
 .cabecalho-livro .logo-site {
