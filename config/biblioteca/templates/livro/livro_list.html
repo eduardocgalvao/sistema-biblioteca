@@ -40,7 +40,7 @@
                     <th>Status</th>
                     <th>Autores</th>
                     <th>Categorias</th>
-                    <th>Quantidade</th>
+                    <th>Qts Registradas</th>
                     <th>Disponível</th>
                     <th>Criado em</th>
                     <th>Atualizado em</th>
@@ -96,6 +96,8 @@
                             {{ categoria.nome }}{% if not forloop.last %}, {% endif %}
                         {% empty %}-{% endfor %}
                     </td>
+
+                    <!-- Quantidades -->
                     
                     <td>{{ livro.quantidade|default:"0" }}</td>
                     
@@ -190,7 +192,7 @@
             
             <!-- Campo de quantidade -->
             <div class="campo">
-                <label for="edit-quantidade">Quantidade</label>
+                <label for="edit-quantidade">Quantidade Registrada</label>
                 <input type="number" id="edit-quantidade" name="quantidade" min="0" max="2000">
             </div>
 

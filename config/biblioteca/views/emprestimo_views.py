@@ -81,7 +81,7 @@ def registrar_emprestimo(request):
             aluno = get_object_or_404(Aluno, id=aluno_id, ativo=True)
 
             # Disponibilidade física: quantidade > 0
-            if (livro.quantidade or 0) <= 0:
+            if livro.disponivel <= 0:
                 return JsonResponse({'success': False, 'error': 'Livro não disponível para empréstimo'})
 
             # Verificar se aluno já tem este livro emprestado
@@ -89,7 +89,7 @@ def registrar_emprestimo(request):
                 return JsonResponse({'success': False, 'error': 'Aluno já possui este livro emprestado'})
 
             # Decrementa a quantidade física
-            livro.quantidade = (livro.quantidade or 0) - 1
+            livro.disponivel -= 1
 
             # Atualiza status do livro baseado na nova quantidade
             try:
@@ -166,21 +166,19 @@ def registrar_devolucao(request):
                 emprestimo.observacoes = (emprestimo.observacoes or '') + f"\n[Devolução] {observacoes_extra}"
             emprestimo.save()
 
-            # Atualiza livro (incrementa quantidade)
+            # Atualiza livro
             livro = emprestimo.livro
-            livro.quantidade = (livro.quantidade or 0) + 1
+            livro.disponivel += 1
 
             # Atualiza status do livro (Disponível se há ao menos 1 unidade)
             try:
-                disponivel_obj = tbl_status_livro.objects.get(descricao='Disponível')
-                indisponivel_obj = tbl_status_livro.objects.get(descricao='Indisponível')
+                if livro.disponivel > 0:
+                    status_obj = tbl_status_livro.objects.get(descricao='Disponível')
+                else:
+                    status_obj = tbl_status_livro.objects.get(descricao='Indisponível')
+                livro.status = status_obj
             except tbl_status_livro.DoesNotExist:
                 return JsonResponse({'success': False, 'error': "Status 'Disponível'/'Indisponível' inexistente no banco"})
-
-            if livro.quantidade > 0:
-                livro.status = disponivel_obj
-            else:
-                livro.status = indisponivel_obj
 
             livro.save()
 

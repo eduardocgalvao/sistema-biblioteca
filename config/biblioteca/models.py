@@ -89,7 +89,8 @@ class tbl_livro(models.Model):
     isbn = models.CharField(max_length=20)
     titulo = models.CharField(max_length=255)
     ano_publicacao = models.IntegerField()
-    quantidade = models.IntegerField(default=0)
+    quantidade = models.IntegerField(default=0)  # Estoque total (NUNCA muda)
+    disponivel = models.IntegerField(default=0)  # Disponíveis para empréstimo (VARIÁVEL)
 
     editora = models.ForeignKey(tbl_editora, on_delete=models.PROTECT)
     status = models.ForeignKey(tbl_status_livro, on_delete=models.PROTECT)
@@ -109,14 +110,32 @@ class tbl_livro(models.Model):
     def save(self, *args, **kwargs):
         try:
             self.quantidade = int(self.quantidade)
+            self.disponivel = int(self.disponivel)
         except (TypeError, ValueError):
             self.quantidade = 0
+            self.disponivel = 0
 
+        # Na primeira criação, define disponivel = quantidade
+        if not self.pk and self.disponivel == 0 and self.quantidade > 0:
+            self.disponivel = self.quantidade
+        else:
+            # Verifica se quantidade foi alterada manualmente
+            try:
+                original = tbl_livro.objects.get(pk=self.pk)
+
+            # Se quantidade foi alterada, ajusta disponivel proporcionalmente
+                if self.disponivel < 0:
+                    self.disponivel = 0
+
+            except tbl_livro.DoesNotExist:
+                pass
+            
         # Só define status automaticamente se ainda não foi definido manualmente
         if not self.status_id:
+        
             status_map = {
-                "Disponível": self.quantidade > 0,
-                "Indisponível": self.quantidade <= 0,
+                "Disponível": self.disponivel > 0,
+                "Indisponível": self.disponivel <= 0,
             }
 
             for descricao, condicao in status_map.items():

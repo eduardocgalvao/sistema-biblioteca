@@ -27,35 +27,39 @@ $(document).ready(function () {
 
     // ============= abrir modal =============
     $(document).on('click', '.emprestar-icon:not(.disabled)', function () {
-        const $tr = $(this).closest('tr');
+    const $tr = $(this).closest('tr');
+    
+    // Verifica se realmente está disponível
+    let disponivel = parseInt($tr.data('disponivel') || $tr.find('.quantidade-disponivel').text().trim()) || 0;
+    
+    if (disponivel <= 0) {
+        alert('Este livro não está mais disponível para empréstimo.');
+        // Atualiza o botão para disabled
+        $(this).prop('disabled', true).addClass('disabled');
+        return;
+    }
+    
+    const livroId = $tr.data('id') || $(this).data('id');
+    const livroTitulo = $tr.data('titulo') || $tr.find('td:nth-child(3)').text().trim();
 
-        // use data-* do tr; seu template já tem data-id e data-titulo e data-disponivel
-        const livroId = $tr.data('id') || $(this).data('id');
-        const livroTitulo = $tr.data('titulo') || $tr.find('td:nth-child(3)').text().trim();
-        let disponivel = $tr.data('disponivel');
-        if (typeof disponivel === 'undefined') {
-            // fallback: buscar do texto e garantir número
-            disponivel = parseInt($tr.find('.quantidade-disponivel').text().trim()) || 0;
-        }
+    livroAtual = {
+        id: livroId,
+        titulo: livroTitulo,
+        disponivel: disponivel
+    };
 
-        livroAtual = {
-            id: livroId,
-            titulo: livroTitulo,
-            disponivel: parseInt(disponivel, 10) || 0
-        };
+    // preencher modal
+    $('#emprestar-livro-id').val(livroAtual.id);
+    $('#emprestar-livro-titulo').val(livroAtual.titulo);
+    $('#modal-livro-titulo').text(livroAtual.titulo);
+    $('#modal-livro-disponivel').text(livroAtual.disponivel);
+    $('#resumo-livro').text(livroAtual.titulo);
 
-        // preencher modal
-        $('#emprestar-livro-id').val(livroAtual.id);
-        $('#emprestar-livro-titulo').val(livroAtual.titulo);
-        $('#modal-livro-titulo').text(livroAtual.titulo);
-        $('#modal-livro-disponivel').text(livroAtual.disponivel);
-        $('#resumo-livro').text(livroAtual.titulo);
-
-        resetarAluno();
-        calcularDataDevolucao();
-        atualizarResumo();
-        abrirModal('#emprestar-modal');
-    });
+    resetarAluno();
+    calcularDataDevolucao();
+    atualizarResumo();
+    abrirModal('#emprestar-modal');
+});
 
     // ============= buscar aluno =============
     $('#btn-buscar-aluno').on('click', buscarAlunos);
@@ -192,6 +196,9 @@ $(document).ready(function () {
             observacoes: $('#observacoes').val() || ''
         };
 
+        // Desabilitar botão para evitar duplo clique
+        $('.btn-confirmar-emprestimo').prop('disabled', true).text('Processando...');
+
         $.ajax({
             url: window.API_URLS.registrarEmprestimo,
             method: 'POST',
@@ -201,10 +208,11 @@ $(document).ready(function () {
             success: function (response) {
                 if (response && response.success) {
                     alert(response.mensagem || 'Empréstimo registrado.');
+                    atualizarLinhaLivroAposEmprestimo(livroAtual.id);
                     fecharModal('#emprestar-modal');
-                    location.reload(); // simples e seguro; pode ser substituído por atualização parcial
-                } else {
-                    alert(response && response.error ? response.error : 'Erro ao registrar empréstimo');
+            } else {
+                alert(response && response.error ? response.error : 'Erro ao registrar empréstimo');
+                $('.btn-confirmar-emprestimo').prop('disabled', false).text('Confirmar Empréstimo');
                 }
             },
             error: function (xhr) {
@@ -216,9 +224,65 @@ $(document).ready(function () {
                 } catch (e) { /* ignore */ }
                 alert(msg);
                 console.error('Erro AJAX registrar empréstimo:', xhr);
-            }
-        });
+
+            $('.btn-confirmar-emprestimo').prop('disabled', false).text('Confirmar Empréstimo');
+        }
+    });
+}
+
+function atualizarLinhaLivroAposEmprestimo(livroId) {
+    // 1. Encontra a linha do livro na tabela
+    const $linha = $(`tr[data-id="${livroId}"]`);
+    
+    if ($linha.length === 0) {
+        console.warn('Linha do livro não encontrada, recarregando página...');
+        location.reload();
+        return;
     }
+    
+    // 2. Atualiza o disponível (diminui 1)
+    const disponivelAtual = parseInt($linha.data('disponivel') || $linha.find('.quantidade-disponivel').text().trim());
+    const novoDisponivel = Math.max(0, disponivelAtual - 1);
+    
+    // 3. Atualiza na tabela
+    $linha.attr('data-disponivel', novoDisponivel);
+    $linha.find('.quantidade-disponivel').text(novoDisponivel);
+    
+    // 4. Atualiza a classe CSS (indisponível se for 0)
+    const $spanDisponivel = $linha.find('.quantidade-disponivel');
+    if (novoDisponivel === 0) {
+        $spanDisponivel.addClass('indisponivel');
+        
+        // Desabilita botão de emprestar
+        $linha.find('.emprestar-icon').prop('disabled', true).addClass('disabled');
+        
+        // Atualiza status para "Indisponível"
+        const $statusBadge = $linha.find('.status-badge');
+        $statusBadge.removeClass().addClass('status-badge status-indisponivel');
+        $statusBadge.text('Indisponível');
+    } else {
+        $spanDisponivel.removeClass('indisponivel');
+        
+        // Atualiza status para "Disponível" se ainda tiver
+        if (novoDisponivel > 0) {
+            const $statusBadge = $linha.find('.status-badge');
+            $statusBadge.removeClass().addClass('status-badge status-disponivel');
+            $statusBadge.text('Disponível');
+        }
+    }
+    
+    // 5. Atualiza o modal se estiver aberto para o mesmo livro
+    if (livroAtual && livroAtual.id === livroId) {
+        livroAtual.disponivel = novoDisponivel;
+        $('#modal-livro-disponivel').text(novoDisponivel);
+        
+        // Se agora está indisponível, fecha o modal
+        if (novoDisponivel === 0) {
+            fecharModal('#emprestar-modal');
+            alert('Atenção: Este livro agora está indisponível para novos empréstimos.');
+        }
+    }
+}
 
     // ligar submit do form para chamar registrarEmprestimo (apenas 1 handler)
     $('#emprestar-form').on('submit', function (e) {
@@ -233,10 +297,22 @@ $(document).ready(function () {
     }
 
     function fecharModal(selector) {
-        $(selector).addClass('hidden');
-        $('body').css('overflow', 'auto');
+    $(selector).addClass('hidden');
+    $('body').css('overflow', 'auto');
+    
+    // Resetar apenas se for o modal de empréstimo
+    if (selector === '#emprestar-modal') {
         resetarAluno();
+        
+        // Resetar campos do formulário
+        $('#observacoes').val('');
+        $('#dias-emprestimo').val('10');
+        calcularDataDevolucao();
+        
+        // Reabilitar botão de confirmação
+        $('.btn-confirmar-emprestimo').prop('disabled', true).text('Confirmar Empréstimo');
     }
+}
 
     $('.close-modal, .btn-cancelar').on('click', function () {
         const $modal = $(this).closest('.modal');

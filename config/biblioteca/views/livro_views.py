@@ -74,7 +74,7 @@ def livro_list(request):
             'livro': livro,
             'autores': list(livro.autores.all()),
             'categorias': list(livro.categorias.all()),
-            'disponivel': max(0, disponivel)  # Não permite negativo
+            'disponivel': livro.disponivel  # Não permite negativo
         })
     
     # Outros dados para o template
@@ -241,7 +241,36 @@ def api_livro_update(request, livro_id):
             if 'quantidade' in data:
                 qtde = data['quantidade']
                 if qtde is not None and qtde != '':
-                    livro.quantidade = qtde
+                    try:
+                        nova_quantidade = int(qtde)
+                        quantidade_original = livro.quantidade
+                        
+                        print(f"DEBUG: Atualizando quantidade de {quantidade_original} para {nova_quantidade}")
+                        
+                        # 1. Conta empréstimos ativos ANTES de mudar qualquer coisa
+                        emprestimos_ativos = livro.emprestimos.filter(status='ativo').count()
+                        print(f"DEBUG: Empréstimos ativos: {emprestimos_ativos}")
+                        
+                        # 2. Atualiza a quantidade (estoque total)
+                        livro.quantidade = nova_quantidade
+                        
+                        # 3. Calcula o novo disponivel CORRETAMENTE
+                        # disponivel = quantidade - emprestimos_ativos
+                        novo_disponivel = max(0, nova_quantidade - emprestimos_ativos)
+                        
+                        print(f"DEBUG: Cálculo: {nova_quantidade} - {emprestimos_ativos} = {novo_disponivel}")
+                        
+                        # 4. Atualiza o disponivel
+                        livro.disponivel = novo_disponivel
+                        
+                        print(f"DEBUG: Disponível ajustado para: {livro.disponivel}")
+                        
+                    except (ValueError, TypeError) as e:
+                        print(f"DEBUG: Erro ao converter quantidade: {e}")
+                        return JsonResponse({
+                            'success': False, 
+                            'error': 'Quantidade deve ser um número válido'
+                        }, status=400)
 
             # Atualiza Editora
             if 'editora_id' in data and data['editora_id']:
@@ -262,6 +291,24 @@ def api_livro_update(request, livro_id):
             # 4. SALVA O LIVRO (Básico + Capa)
             livro.save()
             print(f"Livro {livro_id} salvo com sucesso.")
+
+            if not data.get('status_id'):  # Se status não foi definido manualmente
+                if livro.disponivel > 0:
+                    try:
+                        status_disponivel = tbl_status_livro.objects.get(descricao='Disponível')
+                        livro.status = status_disponivel
+                        livro.save()
+                        print(f"DEBUG: Status auto-atualizado para 'Disponível' (disponivel={livro.disponivel})")
+                    except tbl_status_livro.DoesNotExist:
+                        print("DEBUG: Status 'Disponível' não encontrado")
+                else:
+                    try:
+                        status_indisponivel = tbl_status_livro.objects.get(descricao='Indisponível')
+                        livro.status = status_indisponivel
+                        livro.save()
+                        print(f"DEBUG: Status auto-atualizado para 'Indisponível' (disponivel={livro.disponivel})")
+                    except tbl_status_livro.DoesNotExist:
+                        print("DEBUG: Status 'Indisponível' não encontrado")
 
             # 5. ATUALIZAÇÃO MANY-TO-MANY (Autores e Categorias)
             # Função auxiliar para não repetir código
@@ -305,12 +352,21 @@ def api_livro_update(request, livro_id):
             # Executa para Categorias
             atualizar_relacao('categorias_ids', tbl_livro_categoria, tbl_categoria, 'categoria')
 
-            return JsonResponse({'success': True, 'message': 'Livro atualizado!'})
+            return JsonResponse({
+                'success': True, 
+                'message': 'Livro atualizado!',
+                'livro': {
+                    'quantidade': livro.quantidade,
+                    'disponivel': livro.disponivel,
+                    'status': livro.status.descricao if livro.status else None,
+                    'emprestimos_ativos': livro.emprestimos.filter(status='ativo').count()
+                }
+            })
 
         except Exception as e:
             print(f"ERRO CRÍTICO: {str(e)}")
             import traceback
-            traceback.print_exc() # Isso mostra a linha exata do erro no terminal
+            traceback.print_exc()
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
     
     return JsonResponse({'success': False, 'error': 'Método inválido'}, status=405)
