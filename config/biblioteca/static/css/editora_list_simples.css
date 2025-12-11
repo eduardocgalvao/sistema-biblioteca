@@ -1,0 +1,454 @@
+/* Estilos para a listagem simples de editoras */
+
+:root{
+    --bg: #f5f5f5;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --accent: #019c99;
+    --border: #ddd;
+}
+
+body{
+    font-family: 'Lexend', Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: #111827;
+}
+
+.editoras-container{
+    width: 100%;
+    padding: 20px 40px;
+    background: var(--bg);
+    min-height: 100vh;
+}
+
+.top-bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    height: 60px;
+}
+
+.top-bar .voltar{
+    font-size: 25px;
+    text-decoration: none;
+    color: #000000;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+.top-bar .voltar:hover{
+    color: var(--accent);
+}
+
+.top-bar h1{
+    flex: 1;
+    font-size: 22px;
+    margin: 0;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ========== TABELA DE EDITORAS ========== */
+.card-tabela {
+    background: white;
+    margin: 0 auto;
+    padding: 25px;
+    border-radius: 12px;
+    width: 100%;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    overflow-x: auto;
+}
+
+.tabela-editoras {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+/* Cabeçalho da tabela */
+.tabela-editoras thead tr {
+    background: var(--accent);
+    color: white;
+}
+
+.tabela-editoras thead th {
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* Linhas da tabela */
+.tabela-editoras tbody tr {
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.tabela-editoras tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.tabela-editoras tbody td {
+    padding: 15px 12px;
+    vertical-align: top;
+}
+
+/* Coluna de ações */
+.acoes-cell {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.acoes-col {
+    width: 80px;
+    text-align: center;
+}
+
+.btn {
+    cursor: pointer;
+    font-size: 18px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: 1px solid transparent;
+}
+
+.back-btn {
+    position: absolute;
+    top: 25px;
+    left: 290px;
+    font-size: 26px;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
+
+
+.btn-edit {
+    color: var(--accent);
+}
+
+.btn-edit:hover {
+    background-color: #e3f2fd;
+    border-color: var(--accent);
+}
+
+.btn-delete {
+    color: #d32f2f;
+}
+
+.btn-delete:hover {
+    background-color: #ffebee;
+    border-color: #d32f2f;
+}
+
+/* Botão de criar fixo no canto superior direito */
+.btn-create {
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    border: none;
+    text-align: center;
+    background-color: var(--accent);
+    color: #ffffff;
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 1200;
+    box-shadow: 0 8px 24px rgba(1, 156, 153, 0.12);
+}
+
+.btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(1, 156, 153, 0.16);
+}
+
+/* Mensagem de tabela vazia */
+.empty-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    font-style: italic;
+    background: #fafafa;
+}
+
+/* ========== MODAIS ========== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Conteúdo do modal */
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    padding: 30px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.modal:not(.hidden) .modal-content {
+    transform: translateY(0);
+}
+
+/* Botão de fechar modal */
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.2s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: none;
+    border: none;
+}
+
+.close-modal:hover {
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+/* Título do modal */
+.modal-content h3 {
+    color: var(--accent);
+    margin-bottom: 25px;
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ========== FORMULÁRIO DE EDIÇÃO ========== */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin: 20px 0 30px 0;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+}
+
+.campo label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.campo input,
+.campo select,
+.select2-container .select2-selection {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    outline: none;
+    font-size: 14px;
+    color: #333;
+    background-color: white;
+    transition: all 0.3s ease;
+    min-height: 46px;
+    line-height: 1.5;
+}
+
+.campo input:focus,
+.campo select:focus,
+.select2-container--default.select2-container--focus .select2-selection {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(1, 156, 153, 0.1) !important;
+}
+
+/* ========== BOTÕES ========== */
+.btn-area {
+    margin-top: 40px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn-salvar,
+.btn-cancelar,
+.btn-confirmar-exclusao {
+    padding: 12px 30px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    min-width: 150px;
+    text-align: center;
+}
+
+/* Botão primário (salvar) */
+.btn-salvar {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-salvar:hover {
+    background: #017a78;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(1, 156, 153, 0.2);
+}
+
+/* Botão secundário (cancelar) */
+.btn-cancelar {
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid var(--border);
+}
+
+.btn-cancelar:hover {
+    background: #e0e0e0;
+    color: #333;
+}
+
+/* Botão de exclusão */
+.btn-confirmar-exclusao {
+    background: #d32f2f;
+    color: white;
+}
+
+.btn-confirmar-exclusao:hover {
+    background: #b71c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
+}
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 768px) {
+    .editoras-container {
+        padding: 15px 20px;
+    }
+
+    .top-bar {
+        flex-direction: column;
+        gap: 15px;
+        height: auto;
+        margin-bottom: 20px;
+    }
+
+    .top-bar h1 {
+        font-size: 18px;
+    }
+
+    .card-tabela {
+        padding: 15px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .btn-area {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .btn-salvar,
+    .btn-cancelar,
+    .btn-confirmar-exclusao {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .tabela-editoras thead {
+        display: none;
+    }
+
+    .tabela-editoras tbody tr {
+        display: block;
+        margin-bottom: 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+    }
+
+    .tabela-editoras tbody td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        border-bottom: 1px solid #f1f3f6;
+    }
+
+    .tabela-editoras tbody td:last-child {
+        border-bottom: none;
+    }
+
+    .tabela-editoras tbody td:before {
+        content: attr(data-label);
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .acoes-cell {
+        border-bottom: none;
+        justify-content: flex-start;
+    }
+
+    .acoes-cell:before {
+        content: "Ações";
+    }
+}
+
