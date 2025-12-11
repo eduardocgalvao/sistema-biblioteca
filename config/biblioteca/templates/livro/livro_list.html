@@ -86,7 +86,7 @@
                     <!-- Autores relacionados -->
                     <td>
                         {% for autor in autores_rel %}
-                            {{ autor.nome }}{% if not forloop.last %}, {% endif %}
+                            {{ autor.nome }} {{ autor.sobrenome }} {% if not forloop.last %}, {% endif %}
                         {% empty %}-{% endfor %}
                     </td>
 
@@ -182,7 +182,7 @@
                     <label for="edit-autores">Autores</label>
                     <select id="edit-autores" name="autores" multiple class="select2-autores">
                         {% for autor in autores %}
-                            <option value="{{ autor.id_autor }}">{{ autor.nome }}</option>
+                            <option value="{{ autor.id_autor }}">{{ autor.nome }} {{ autor.sobrenome }}</option>
                         {% endfor %}
                     </select>
                 </div>

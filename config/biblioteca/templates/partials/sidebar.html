@@ -7,23 +7,28 @@
   </div>
 
   <nav class="menu">
-    <a href="{% url 'livro-list' %}">
+    <!-- NOVO ITEM: Home -->
+    <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+      <span>🏠</span> Home
+    </a>
+
+    <a href="{% url 'livro-list' %}" class="{% if request.resolver_match.url_name == 'livro-list' %}active{% endif %}">
       <span>📚</span> Todos os Livros
     </a>
 
-    <a href="{% url 'livro-create' %}">
+    <a href="{% url 'livro-create' %}" class="{% if request.resolver_match.url_name == 'livro-create' %}active{% endif %}">
       <span>➕</span> Adicionar Livros
     </a>
 
-    <a href="{% url 'editora-list' %}">
+    <a href="{% url 'editora-list' %}" class="{% if request.resolver_match.url_name == 'editora-list' %}active{% endif %}">
       <span>🏢</span> Editoras
     </a>
 
-    <a href="{% url 'autor-list' %}">
+    <a href="{% url 'autor-list' %}" class="{% if request.resolver_match.url_name == 'autor-list' %}active{% endif %}">
       <span>🖋️</span> Autores
     </a>
 
-    <a href="{% url 'categoria-list' %}">
+    <a href="{% url 'categoria-list' %}" class="{% if request.resolver_match.url_name == 'categoria-list' %}active{% endif %}">
       <span>📦</span> Categorias
     </a>
   </nav>

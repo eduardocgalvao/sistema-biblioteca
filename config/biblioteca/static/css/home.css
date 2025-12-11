@@ -66,10 +66,11 @@ body {
     border-radius: 10px;
     transition: all 0.2s ease;
     outline: none;
+    position: relative;
 }
 
 /* HOVER & FOCUS */
-.menu a:hover {
+.menu a:hover:not(.active) {
     background: #e6f7f6;
     color: #017a78;
     transform: translateX(4px);
@@ -80,10 +81,25 @@ body {
     outline-offset: 2px;
 }
 
-/* ITEM ATIVO */
+/* ITEM ATIVO - com destaque visual aprimorado */
 .menu a.active {
     background: #017a78;
     color: #ffffff;
+    box-shadow: 0 4px 12px rgba(1, 122, 120, 0.3);
+    font-weight: 600;
+}
+
+/* Indicador visual do item ativo (opcional) */
+.menu a.active::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 70%;
+    background: #017a78;
+    border-radius: 0 4px 4px 0;
 }
 
 /* LOGOUT */
