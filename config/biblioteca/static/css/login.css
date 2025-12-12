@@ -136,11 +136,17 @@ input:focus {
 /* ================================
    LINK DE REGISTRO
 ================================ */
-.register-link {
-  margin-bottom: 15px;
-  color: #999;
-  font-size: 0.85rem;
-  text-decoration: none;
+.register-link p a {
+    text-decoration: none;
+    color: #0e9c99;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color .25s ease;
+}
+
+.register-link p a:hover {
+    color: #0b7c7a;
 }
 
 /* ================================
