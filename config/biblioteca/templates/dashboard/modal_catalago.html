@@ -71,11 +71,6 @@
                         </span>
                     </div>
                     
-                    <div class="detail-row">
-                        <span class="detail-label">📈 Empréstimos Ativos:</span>
-                        <span class="detail-value" id="modalBookLoaned"></span>
-                    </div>
-                    
                     <!-- Status dinâmico -->
                     <div class="detail-row">
                         <span class="detail-label">📈 Status:</span>
@@ -90,11 +85,6 @@
                         <span class="detail-value" id="modalBookCreated"></span>
                     </div>
                     
-                    <div class="detail-row">
-                        <span class="detail-label">🔄 Última Atualização:</span>
-                        <span class="detail-value" id="modalBookUpdated"></span>
-                    </div>
-                    
                     <!-- Descrição -->
                     <div class="detail-row full-width">
                         <span class="detail-label">📝 Sinopse/Descrição:</span>
@@ -102,6 +92,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
 <script>
 // Variáveis globais
@@ -109,11 +102,22 @@ let livroAtualId = null;
 let livroAtualTitulo = '';
 let livroAtualDisponivel = 0;
 
-// Função para abrir modal de detalhes (atualizada)
-function openBookModal(livroId) {
-    livroAtualId = livroId;
+// Função para abrir modal de detalhes
+window.openBookModal = function(livroId) {
+    console.log('Abrindo modal para livro ID:', livroId);
+
+    // Verificar se o modal existe
+    const modal = document.getElementById('bookModal');
+    if (!modal) {
+        console.error('ERRO: Modal não encontrado!');
+        alert('Erro: Modal não disponível');
+        return;
+    }
     
-    fetch(`/api/livros/${livroId}/`)
+    livroAtualId = livroId;
+
+    // URL
+    fetch(`/api/livro/${livroId}/`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Erro na requisição: ' + response.status);
@@ -121,12 +125,11 @@ function openBookModal(livroId) {
             return response.json();
         })
         .then(data => {
-            if (data.error) {
-                mostrarErroModal('Erro ao carregar dados do livro: ' + data.error);
-                return;
-            }
-            
             console.log('Dados recebidos do livro:', data);
+            
+            // Verificar se tem dt_atualizacao
+            console.log('Data de atualização recebida:', data.dt_atualizacao);
+            console.log('Todos os campos recebidos:', Object.keys(data));
             
             // Preencher campos do modal com dados REAIS do banco
             preencherCamposModal(data);
@@ -140,15 +143,26 @@ function openBookModal(livroId) {
             
             // Mostrar modal
             document.getElementById('bookModal').style.display = 'flex';
+            
+            // DEBUG: Verificar se os elementos foram preenchidos
+            setTimeout(() => {
+                console.log('Elemento modalBookUpdated após preenchimento:', 
+                    document.getElementById('modalBookUpdated'));
+                console.log('Conteúdo de modalBookUpdated:', 
+                    document.getElementById('modalBookUpdated')?.textContent);
+            }, 100);
         })
         .catch(error => {
             console.error('Erro ao carregar livro:', error);
             mostrarErroModal('Erro ao carregar dados do livro. Tente novamente.');
         });
-}
+};
 
 // Função para preencher campos do modal com dados reais
 function preencherCamposModal(data) {
+    // DEBUG: Log inicial
+    console.log('Preenchendo modal com dados:', data);
+
     // Informações principais
     document.getElementById('modalBookMainTitle').textContent = data.titulo || 'Título não informado';
     document.getElementById('modalBookTitleText').textContent = data.titulo || 'Título não informado';
@@ -168,32 +182,56 @@ function preencherCamposModal(data) {
     const disponivel = data.disponivel || 0;
     document.getElementById('modalBookAvailableValue').textContent = disponivel;
     
-    // Empréstimos ativos (calculado: quantidade - disponível)
-    const emprestados = Math.max(0, quantidade - disponivel);
-    document.getElementById('modalBookLoaned').textContent = emprestados;
-    
     // Status do livro (REAL do banco)
     const status = data.status || 'Não informado';
     const statusElement = document.getElementById('modalBookStatus');
-    statusElement.textContent = status;
-    statusElement.className = 'status-badge ' + getStatusClass(status);
+    if (statusElement) {
+        statusElement.textContent = status;
+        statusElement.className = 'status-badge ' + getStatusClass(status);
+    }
     
-    // Datas
-    document.getElementById('modalBookCreated').textContent = data.dt_criacao || 'Data não informada';
-    document.getElementById('modalBookUpdated').textContent = data.dt_atualizacao || 'Data não informada';
+    // Datas: usar nomes corretos do JSON
+    const createdElement = document.getElementById('modalBookCreated');
+    const updatedElement = document.getElementById('modalBookUpdated');
+    
+    if (createdElement) {
+        createdElement.textContent = data.dt_criacao || 'Data não informada';
+        console.log('modalBookCreated preenchido:', data.dt_criacao);
+    }
+    
+    if (updatedElement) {
+        updatedElement.textContent = data.dt_atualizacao || 'Data não informada';
+        console.log('modalBookUpdated preenchido:', data.dt_atualizacao);
+        
+        // Forçar repaint (solução para renderização)
+        updatedElement.style.display = 'none';
+        updatedElement.offsetHeight; // Trigger reflow
+        updatedElement.style.display = '';
+    } else {
+        console.error('ERRO: Elemento modalBookUpdated não encontrado no DOM!');
+    }
+    
+    // DEBUG para verificar se os campos estão sendo preenchidos
+    console.log('Data criação:', data.dt_criacao);
+    console.log('Data atualização:', data.dt_atualizacao);
     
     // Descrição
-    document.getElementById('modalBookDescription').textContent = 
-        data.descricao || 'Descrição não disponível para este livro.';
+    const descriptionElement = document.getElementById('modalBookDescription');
+    if (descriptionElement) {
+        descriptionElement.textContent = 
+            data.descricao || 'Descrição não disponível para este livro.';
+    }
     
     // Capa do livro
     const imgElement = document.getElementById('modalBookCover');
-    if (data.capa_url) {
-        imgElement.src = data.capa_url;
-        imgElement.alt = `Capa de ${data.titulo}`;
-    } else {
-        imgElement.src = "{% static 'images/default-cover.png' %}";
-        imgElement.alt = "Capa padrão";
+    if (imgElement) {
+        if (data.capa_url) {
+            imgElement.src = data.capa_url;
+            imgElement.alt = `Capa de ${data.titulo}`;
+        } else {
+            imgElement.src = "{% static 'images/default-cover.png' %}";
+            imgElement.alt = "Capa padrão";
+        }
     }
     
     // Atualizar indicadores visuais
@@ -205,39 +243,44 @@ function atualizarIndicadores(quantidade, disponivel) {
     const quantidadeIndicator = document.getElementById('modalBookQuantityIndicator');
     const disponivelIndicator = document.getElementById('modalBookAvailabilityIndicator');
     
-    // Indicador de quantidade total
-    if (quantidade <= 0) {
-        quantidadeIndicator.textContent = ' (ESGOTADO)';
-        quantidadeIndicator.className = 'quantity-indicator esgotado';
-    } else if (quantidade <= 3) {
-        quantidadeIndicator.textContent = ' (BAIXO ESTOQUE)';
-        quantidadeIndicator.className = 'quantity-indicator baixo';
-    } else if (quantidade <= 10) {
-        quantidadeIndicator.textContent = ' (ESTOQUE MÉDIO)';
-        quantidadeIndicator.className = 'quantity-indicator medio';
-    } else {
-        quantidadeIndicator.textContent = ' (ESTOQUE SUFICIENTE)';
-        quantidadeIndicator.className = 'quantity-indicator suficiente';
+    if (quantidadeIndicator) {
+        // Indicador de quantidade total
+        if (quantidade <= 0) {
+            quantidadeIndicator.textContent = ' (ESGOTADO)';
+            quantidadeIndicator.className = 'quantity-indicator esgotado';
+        } else if (quantidade <= 3) {
+            quantidadeIndicator.textContent = ' (BAIXO ESTOQUE)';
+            quantidadeIndicator.className = 'quantity-indicator baixo';
+        } else if (quantidade <= 10) {
+            quantidadeIndicator.textContent = ' (ESTOQUE MÉDIO)';
+            quantidadeIndicator.className = 'quantity-indicator medio';
+        } else {
+            quantidadeIndicator.textContent = ' (ESTOQUE SUFICIENTE)';
+            quantidadeIndicator.className = 'quantity-indicator suficiente';
+        }
     }
     
-    // Indicador de disponibilidade
-    if (disponivel <= 0) {
-        disponivelIndicator.textContent = ' (INDISPONÍVEL)';
-        disponivelIndicator.className = 'availability-indicator indisponivel';
-    } else if (disponivel <= 3) {
-        disponivelIndicator.textContent = ' (POUCAS UNIDADES)';
-        disponivelIndicator.className = 'availability-indicator poucas';
-    } else {
-        disponivelIndicator.textContent = ' (DISPONÍVEL)';
-        disponivelIndicator.className = 'availability-indicator disponivel';
+    if (disponivelIndicator) {
+        // Indicador de disponibilidade
+        if (disponivel <= 0) {
+            disponivelIndicator.textContent = ' (INDISPONÍVEL)';
+            disponivelIndicator.className = 'availability-indicator indisponivel';
+        } else if (disponivel <= 3) {
+            disponivelIndicator.textContent = ' (POUCAS UNIDADES)';
+            disponivelIndicator.className = 'availability-indicator poucas';
+        } else {
+            disponivelIndicator.textContent = ' (DISPONÍVEL)';
+            disponivelIndicator.className = 'availability-indicator disponivel';
+        }
     }
 }
 
 // Função para obter classe CSS baseada no status
 function getStatusClass(status) {
+    if (!status) return 'status-default';
     const statusLower = status.toLowerCase();
     if (statusLower.includes('disponível')) return 'status-disponivel';
-    if (statusLower.includes('indisponível') || statusLower.includes('esgotado')) return 'status-indisponivel';
+    if (statusLower.includes('indisponível')) return 'status-indisponivel';
     if (statusLower.includes('emprestado')) return 'status-emprestado';
     if (statusLower.includes('reservado')) return 'status-reservado';
     if (statusLower.includes('manutenção')) return 'status-manutencao';
@@ -251,17 +294,19 @@ function configurarBotoesAcao(data) {
     const btnExcluir = document.getElementById('btnExcluir');
     
     // Configurar botão de empréstimo
-    const disponivel = data.disponivel || 0;
-    if (disponivel > 0) {
-        btnEmprestar.disabled = false;
-        btnEmprestar.innerHTML = '📥 Emprestar Livro';
-        btnEmprestar.className = 'btn btn-success';
-        btnEmprestar.onclick = function() { iniciarEmprestimo(data.id, data.titulo, disponivel); };
-    } else {
-        btnEmprestar.disabled = true;
-        btnEmprestar.innerHTML = '📦 Indisponível no momento';
-        btnEmprestar.className = 'btn btn-secondary';
-        btnEmprestar.onclick = null;
+    if (btnEmprestar) {
+        const disponivel = data.disponivel || 0;
+        if (disponivel > 0) {
+            btnEmprestar.disabled = false;
+            btnEmprestar.innerHTML = '📥 Emprestar Livro';
+            btnEmprestar.className = 'btn btn-success';
+            btnEmprestar.onclick = function() { iniciarEmprestimo(data.id, data.titulo, disponivel); };
+        } else {
+            btnEmprestar.disabled = true;
+            btnEmprestar.innerHTML = '📦 Indisponível no momento';
+            btnEmprestar.className = 'btn btn-secondary';
+            btnEmprestar.onclick = null;
+        }
     }
     
     // Configurar botões de edição/exclusão (apenas para staff)
@@ -276,12 +321,18 @@ function configurarBotoesAcao(data) {
 
 // Função para iniciar processo de empréstimo
 function iniciarEmprestimo(livroId, titulo, disponivel) {
-    document.getElementById('confirmLoanTitle').textContent = titulo;
-    document.getElementById('confirmLoanMessage').innerHTML = `
-        Deseja emprestar o livro <strong>"${titulo}"</strong>?<br>
-        <small>Unidades disponíveis: ${disponivel}</small>
-    `;
-    document.getElementById('confirmLoanModal').style.display = 'flex';
+    const confirmLoanTitle = document.getElementById('confirmLoanTitle');
+    const confirmLoanMessage = document.getElementById('confirmLoanMessage');
+    const confirmLoanModal = document.getElementById('confirmLoanModal');
+    
+    if (confirmLoanTitle && confirmLoanMessage && confirmLoanModal) {
+        confirmLoanTitle.textContent = titulo;
+        confirmLoanMessage.innerHTML = `
+            Deseja emprestar o livro <strong>"${titulo}"</strong>?<br>
+            <small>Unidades disponíveis: ${disponivel}</small>
+        `;
+        confirmLoanModal.style.display = 'flex';
+    }
 }
 
 // Função para confirmar empréstimo
@@ -294,7 +345,10 @@ function confirmarEmprestimo() {
 
 // Função para fechar modal de confirmação de empréstimo
 function fecharConfirmLoanModal() {
-    document.getElementById('confirmLoanModal').style.display = 'none';
+    const confirmLoanModal = document.getElementById('confirmLoanModal');
+    if (confirmLoanModal) {
+        confirmLoanModal.style.display = 'none';
+    }
 }
 
 // Função para editar livro
@@ -309,7 +363,7 @@ function excluirLivroModal(livroId, titulo) {
     if (!titulo) titulo = livroAtualTitulo;
     
     if (confirm(`Tem certeza que deseja excluir o livro "${titulo}"?\n\nEsta ação não pode ser desfeita.`)) {
-        fetch(`/api/livros/${livroId}/`, {
+        fetch(`/api/livro/${livroId}/delete/`, {
             method: 'DELETE',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken'),
@@ -335,18 +389,25 @@ function excluirLivroModal(livroId, titulo) {
 
 // Função para mostrar erro no modal
 function mostrarErroModal(mensagem) {
-    document.getElementById('modalBookMainTitle').textContent = 'Erro';
-    document.getElementById('modalBookTitleText').textContent = mensagem;
-    document.getElementById('bookModal').style.display = 'flex';
+    const mainTitle = document.getElementById('modalBookMainTitle');
+    const titleText = document.getElementById('modalBookTitleText');
+    const modal = document.getElementById('bookModal');
+    
+    if (mainTitle) mainTitle.textContent = 'Erro';
+    if (titleText) titleText.textContent = mensagem;
+    if (modal) modal.style.display = 'flex';
 }
 
 // Função para fechar modal
-function closeModal(event) {
+window.closeModal = function(event) {
     if (!event || event.target.classList.contains('modal-overlay') || 
         event.target.classList.contains('modal-close') ||
         (event.target.textContent && event.target.textContent.includes('Fechar'))) {
-        document.getElementById('bookModal').style.display = 'none';
-        document.getElementById('confirmLoanModal').style.display = 'none';
+        const bookModal = document.getElementById('bookModal');
+        const confirmLoanModal = document.getElementById('confirmLoanModal');
+        
+        if (bookModal) bookModal.style.display = 'none';
+        if (confirmLoanModal) confirmLoanModal.style.display = 'none';
     }
 }
 
@@ -371,5 +432,14 @@ document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
         closeModal();
     }
+});
+
+// Inicialização quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Modal de catálogo carregado');
+    
+    // Teste: verificar se elementos existem
+    console.log('Elemento modalBookUpdated existe?', document.getElementById('modalBookUpdated'));
+    console.log('Elemento bookModal existe?', document.getElementById('bookModal'));
 });
 </script>
