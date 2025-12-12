@@ -35,11 +35,13 @@
                     <th>Ações</th>
                     <th>Capa</th>
                     <th>Título</th>
+                    <th>ISBN</th>
                     <th>Ano</th>
                     <th>Editora</th>
                     <th>Status</th>
                     <th>Autores</th>
                     <th>Categorias</th>
+                    <th>Descrição</th>
                     <th>Qts Registradas</th>
                     <th>Disponível</th>
                     <th>Criado em</th>
@@ -50,8 +52,10 @@
             <tbody>
                 {% for item in livros_com_relacionados %}
                 {% with livro=item.livro autores_rel=item.autores categorias_rel=item.categorias %}
+
                 <!-- Linha da tabela representando um único livro -->
                 <tr data-id="{{ livro.id_livro }}" data-titulo="{{ livro.titulo }}" data-disponivel="{{ item.disponivel }}">
+
                     <!-- Botões de ação -->
                     <td class="acoes-cell">
                         {% if item.disponivel > 0 %}
@@ -71,10 +75,20 @@
                         {% endif %}
                     </td>
 
-                    <!-- Informações principais -->
-                    <td>{{ livro.titulo }}</td>
+                    <!-- Título -->
+                    <td class="titulo-cell">{{ livro.titulo }}</td>
+                    
+                    <!-- ISBN -->
+                    <td class="isbn-cell">
+                        <span class="isbn-code">{{ livro.isbn|default:"-" }}</span>
+                    </td>
+
+                    <!-- Ano -->
                     <td>{{ livro.ano_publicacao|default:"-" }}</td>
+
+                    <!-- Editora -->
                     <td>{{ livro.editora.nome|default:"-" }}</td>
+
 
                     <!-- Status com classe dinâmica -->
                     <td>
@@ -83,25 +97,39 @@
                         </span>
                     </td>
 
-                    <!-- Autores relacionados -->
-                    <td>
+                    <!-- Autores relacionados - COM TAGS -->
+                    <td class="autores-cell">
                         {% for autor in autores_rel %}
-                            {{ autor.nome }} {{ autor.sobrenome }} {% if not forloop.last %}, {% endif %}
+                            <span class="autor-tag">{{ autor.nome }} {{ autor.sobrenome }}</span>
                         {% empty %}-{% endfor %}
                     </td>
 
-                    <!-- Categorias relacionadas -->
-                    <td>
+                    <!-- Categorias relacionadas - COM TAGS -->
+                    <td class="categorias-cell">
                         {% for categoria in categorias_rel %}
-                            {{ categoria.nome }}{% if not forloop.last %}, {% endif %}
+                            <span class="categoria-tag">{{ categoria.nome }}</span>
                         {% empty %}-{% endfor %}
                     </td>
 
-                    <!-- Quantidades -->
+                    <!-- Descrição -->
+                    <td class="descricao-cell">
+                        {% if livro.descricao %}
+                            <div class="descricao-truncada" title="{{ livro.descricao }}">
+                                {{ livro.descricao|truncatechars:60 }}
+                            </div>
+                            {% if livro.descricao|length > 60 %}
+                            <button class="ver-mais-btn" data-descricao="{{ livro.descricao }}">Ver mais</button>
+                            {% endif %}
+                        {% else %}
+                            <span class="sem-descricao">-</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Quantidades Registrada -->
+                    <td class="quantidade-cell">{{ livro.quantidade|default:"0" }}</td>
                     
-                    <td>{{ livro.quantidade|default:"0" }}</td>
-                    
-                    <td>
+                    <!-- Quantidade Disponível -->
+                    <td class="disponivel-cell">
                         <span class="quantidade-disponivel {% if item.disponivel == 0 %}indisponivel{% endif %}">
                             {{ item.disponivel }}
                         </span>
@@ -115,7 +143,7 @@
                 {% empty %}
                 <!-- Exibido quando não há dados -->
                 <tr>
-                    <td colspan="12" class="empty-message">Nenhum livro cadastrado no sistema.</td>
+                    <td colspan="14" class="empty-message">Nenhum livro cadastrado no sistema.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -126,8 +154,10 @@
 <!-- ===================== MODAL DE EDIÇÃO ===================== -->
 <div id="edit-modal" class="modal hidden">
     <div class="modal-content">
-        <span class="close-modal">×</span>
-        <h3>Editar Livro</h3>
+        <div class="modal-header">
+            <h3><span class="modal-icon">📖</span> Editar Livro</h3>
+            <span class="close-modal">×</span>
+        </div>
 
         <!-- Form de edição (enviado por AJAX) -->
         <form id="edit-form">
@@ -137,15 +167,19 @@
             <div class="form-grid">
                 <!-- Título -->
                 <div class="campo">
-                    <label for="edit-titulo">Título *</label>
-                    <input type="text" id="edit-titulo" name="titulo" />
+                    <label for="edit-titulo">
+                        <span class="label-icon">📌</span> Título *
+                    </label>
+                    <input type="text" id="edit-titulo" name="titulo" placeholder="Digite o título do livro" />
                 </div>
 
                 <!-- Editora -->
                 <div class="campo">
-                    <label for="edit-editora">Editora</label>
-                    <select id="edit-editora" name="editora_id">
-                        <option value="">Selecione...</option>
+                    <label for="edit-editora">
+                        <span class="label-icon">🏢</span> Editora
+                    </label>
+                    <select id="edit-editora" name="editora_id" class="select-single">
+                        <option value="">Selecione uma editora...</option>
                         {% for editora in editoras %}
                             <option value="{{ editora.id_editora }}">{{ editora.nome }}</option>
                         {% endfor %}
@@ -154,71 +188,103 @@
 
                 <!-- Ano -->
                 <div class="campo">
-                    <label for="edit-ano">Ano Publicação</label>
-                    <input type="number" id="edit-ano" name="ano_publicacao" min="1000" max="2099" />
-                </div>
-
-                <!-- Categoria (Select2) -->
-                <div class="campo">
-                    <label for="edit-categoria">Categoria</label>
-                    <select id="edit-categoria" name="categoria_id" multiple class="select2-categoria">
-                        {% for cat in categorias %}
-                            <option value="{{ cat.id_categoria }}">{{ cat.nome }}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="edit-ano">
+                        <span class="label-icon">📅</span> Ano Publicação
+                    </label>
+                    <input type="number" id="edit-ano" name="ano_publicacao" 
+                           min="1000" max="2099" placeholder="Ex: 2024" />
                 </div>
 
                 <!-- Status -->
                 <div class="campo">
-                    <label for="edit-status-select">Status *</label>
-                    <select id="edit-status-select" name="status_id" required>
-                        <option value="">Selecione...</option>
+                    <label for="edit-status-select">
+                        <span class="label-icon">🏷️</span> Status *
+                    </label>
+                    <select id="edit-status-select" name="status_id" required class="select-single">
+                        <option value="">Selecione o status...</option>
                         {% for status in status_list %}
                             <option value="{{ status.id_status }}">{{ status.descricao|title }}</option>
                         {% endfor %}
                     </select>
                 </div>
 
-                <!-- Autores (Select2) -->
+                <!-- Quantidade -->
                 <div class="campo">
-                    <label for="edit-autores">Autores</label>
-                    <select id="edit-autores" name="autores" multiple class="select2-autores">
+                    <label for="edit-quantidade">
+                        <span class="label-icon">📚</span> Quantidade Registrada
+                    </label>
+                    <input type="number" id="edit-quantidade" name="quantidade" 
+                           min="0" max="2000" placeholder="Número de cópias" />
+                </div>
+
+                <!-- Autores (Select2) -->
+                <div class="campo full-width">
+                    <label for="edit-autores">
+                        <span class="label-icon">✍️</span> Autores
+                    </label>
+                    <select id="edit-autores" name="autores" multiple class="select2-multiple select-autores">
                         {% for autor in autores %}
                             <option value="{{ autor.id_autor }}">{{ autor.nome }} {{ autor.sobrenome }}</option>
                         {% endfor %}
                     </select>
+                    <small class="field-hint">Selecione um ou mais autores</small>
                 </div>
-            </div>
-            
-            <!-- Campo de quantidade -->
-            <div class="campo">
-                <label for="edit-quantidade">Quantidade Registrada</label>
-                <input type="number" id="edit-quantidade" name="quantidade" min="0" max="2000">
-            </div>
 
-            <!-- Área de capa -->
-            <div class="campo full-width">
-                <label>Capa do Livro</label>
-                <div class="capa-container">
-                    <!-- Preview da capa atual -->
-                    <div id="capa-preview" class="capa-preview">
-                        <img id="capa-preview-img" alt="Preview" style="display: none;" />
-                        <div id="capa-placeholder" class="capa-placeholder">
-                            <span>📚</span>
-                            <small>Sem capa</small>
-                        </div>
+                <!-- Categorias (Select2) -->
+                <div class="campo full-width">
+                    <label for="edit-categoria">
+                        <span class="label-icon">🏷️</span> Categorias
+                    </label>
+                    <select id="edit-categoria" name="categoria" multiple class="select2-multiple select-categoria">
+                        {% for cat in categorias %}
+                            <option value="{{ cat.id_categoria }}">{{ cat.nome }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="field-hint">Selecione uma ou mais categorias</small>
+                </div>
+
+                <!-- Descrição -->
+                <div class="campo full-width">
+                    <label for="edit-descricao">
+                        <span class="label-icon">📝</span> Descrição
+                    </label>
+                    <textarea id="edit-descricao" name="descricao" rows="4" 
+                              placeholder="Descreva o livro detalhadamente..."></textarea>
+                </div>
+
+                <!-- Capa do Livro -->
+                <div class="campo full-width">
+                    <div class="section-header">
+                        <span class="label-icon">🖼️</span> Capa do Livro
                     </div>
+                    
+                    <div class="capa-container">
+                        <!-- Preview da capa atual -->
+                        <div id="capa-preview" class="capa-preview">
+                            <img id="capa-preview-img" alt="Preview da capa" style="display: none;" />
+                            <div id="capa-placeholder" class="capa-placeholder">
+                                <span>📚</span>
+                                <small>Sem capa</small>
+                            </div>
+                        </div>
 
-                    <!-- Upload -->
-                    <div class="file-input-container">
-                        <input type="file" id="edit-capa" name="capa" accept="image/*" class="file-input" />
-                        <label for="edit-capa" class="file-input-label">📷 Escolher nova capa</label>
-                        <small class="file-help">JPG, PNG ou GIF — máx. 5MB</small>
+                        <!-- Controles da capa -->
+                        <div class="capa-controls">
+                            <div class="file-upload-area">
+                                <input type="file" id="edit-capa" name="capa" accept="image/*" class="file-input" />
+                                <label for="edit-capa" class="file-input-label">
+                                    <span class="upload-icon">📷</span> Escolher nova capa
+                                </label>
+                                <small class="file-help">Formatos: JPG, PNG, GIF • Máx: 5MB</small>
+                            </div>
 
-                        <!-- Remover capa atual -->
-                        <div class="remove-capa-container">
-                            <input type="checkbox" id="remove-capa" name="remove_capa" />
-                            <label for="remove-capa">Remover capa atual</label>
+                            <!-- Remover capa atual -->
+                            <div class="remove-capa-container">
+                                <input type="checkbox" id="remove-capa" name="remove_capa" />
+                                <label for="remove-capa">
+                                    <span class="remove-icon">🗑️</span> Remover capa atual
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -226,8 +292,12 @@
 
             <!-- Botões -->
             <div class="btn-area">
-                <button type="button" class="btn-cancelar">Cancelar</button>
-                <button type="submit" class="btn-salvar">Salvar Alterações</button>
+                <button type="button" class="btn-cancelar">
+                    <span class="btn-icon">↩️</span> Cancelar
+                </button>
+                <button type="submit" class="btn-salvar">
+                    <span class="btn-icon">💾</span> Salvar Alterações
+                </button>
             </div>
         </form>
     </div>
@@ -347,6 +417,60 @@
             buscarAlunos: '{% url "buscar_alunos" %}',
             registrarEmprestimo: '{% url "registrar_emprestimo" %}'
         };
+
+        // Modal para descrição completa
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('ver-mais-btn')) {
+                const descricao = e.target.getAttribute('data-descricao');
+                const modalHTML = `
+                    <div class="modal descricao-modal">
+                        <div class="modal-content">
+                            <span class="close-modal">×</span>
+                            <h3>Descrição Completa</h3>
+                            <div class="descricao-completa">
+                                ${descricao}
+                            </div>
+                            <div class="btn-area">
+                                <button type="button" class="btn-cancelar">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                const modal = document.querySelector('.descricao-modal');
+                modal.classList.remove('hidden');
+                
+                modal.querySelector('.close-modal, .btn-cancelar').addEventListener('click', function() {
+                    modal.remove();
+                });
+                
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        modal.remove();
+                    }
+                });
+            }
+        });
+
+        // Inicialização do Select2 quando o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar Select2 para campos múltiplos
+            $('.select2-multiple').select2({
+                width: '100%',
+                placeholder: 'Selecione...',
+                allowClear: true,
+                dropdownParent: $('#edit-modal')
+            });
+            
+            // Inicializar Select2 para campos simples (opcional)
+            $('.select-single').select2({
+                width: '100%',
+                placeholder: 'Selecione...',
+                allowClear: true,
+                dropdownParent: $('#edit-modal')
+            });
+        });
     </script>
 
     <!-- 1. Utilitários básicos -->
@@ -369,4 +493,4 @@
     
     <!-- 7. Sistema de empréstimos -->
     <script src="{% static 'js/livro/emprestimo.js' %}"></script>
-{% endblock %}``
+{% endblock %}

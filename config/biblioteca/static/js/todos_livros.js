@@ -225,6 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById("edit-ano").value = livro.ano_publicacao || '';
                 document.getElementById("edit-categoria").value = livro.categoria_id || '';
                 document.getElementById("edit-status").value = livro.status_id || '';
+                document.getElementById("edit-descricao").value = livro.descricao || '';
                 
                 // Inicializa Select2 se ainda não foi
                 inicializarSelect2Autores();
@@ -395,6 +396,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('ano_publicacao', document.getElementById("edit-ano").value);
                 formData.append('categoria_id', document.getElementById("edit-categoria").value);
                 formData.append('status_id', document.getElementById("edit-status").value);
+                formData.append('descricao', document.getElementById("edit-descricao").value);
                 
                 // Adiciona autores como JSON string
                 formData.append('autores_ids', JSON.stringify(autoresSelecionados));
@@ -422,6 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     ano_publicacao: document.getElementById("edit-ano").value,
                     categoria_id: document.getElementById("edit-categoria").value,
                     status_id: document.getElementById("edit-status").value,
+                    descricao: document.getElementById("edit-descricao").value,
                     autores_ids: autoresSelecionados
                 };
                 

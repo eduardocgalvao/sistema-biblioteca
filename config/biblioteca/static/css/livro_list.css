@@ -17,7 +17,6 @@
 }
 
 /* ========== TOP-BAR PARA DESKTOP ========== */
-/* Layout: Voltar [ESQUERDA] | Pesquisa [CENTRO] | Logo [DIREITA] */
 .top-bar {
     display: flex;
     align-items: center;
@@ -26,7 +25,6 @@
     height: 60px;
 }
 
-/* Botão Voltar na ESQUERDA */
 .voltar {
     font-size: 25px;
     text-decoration: none;
@@ -41,7 +39,6 @@
     color: #017a78;
 }
 
-/* Barra de Pesquisa CENTRALIZADA */
 .search-box {
     flex: 1;
     display: flex;
@@ -69,7 +66,6 @@
     box-shadow: 0 2px 8px rgba(1, 156, 153, 0.2);
 }
 
-/* Logo na DIREITA */
 .logo-bookstack {
     width: 80px;
     height: auto;
@@ -91,10 +87,9 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
-    min-width: 1200px;
+    min-width: 1400px;
 }
 
-/* Cabeçalho da tabela */
 .tabela-livros thead tr {
     background: #019c99;
     color: white;
@@ -108,7 +103,6 @@
     white-space: nowrap;
 }
 
-/* Linhas da tabela */
 .tabela-livros tbody tr {
     transition: background-color 0.2s ease;
     border-bottom: 1px solid #eaeaea;
@@ -123,12 +117,15 @@
     vertical-align: top;
 }
 
+/* ========== COLUNAS ESPECÍFICAS ========== */
+
 /* Coluna de ações */
 .acoes-cell {
     display: flex;
     gap: 10px;
     justify-content: center;
     align-items: center;
+    min-width: 90px;
 }
 
 .edit-icon, .delete-icon {
@@ -158,6 +155,45 @@
     border-color: #d32f2f;
 }
 
+/* Botão emprestar na tabela */
+.emprestar-icon {
+    cursor: pointer;
+    font-size: 18px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: 1px solid #28a745;
+    color: #28a745;
+}
+
+.emprestar-icon:hover {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #155724;
+    transform: scale(1.1);
+}
+
+.emprestar-icon.disabled {
+    background-color: #f8f9fa;
+    border-color: #6c757d;
+    color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.emprestar-icon.disabled:hover {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border-color: #6c757d;
+    transform: none;
+}
+
 /* Imagem da capa */
 .capa-livro {
     width: 30px;
@@ -180,26 +216,167 @@
     font-size: 12px;
 }
 
+/* Célula do título */
+.titulo-cell {
+    min-width: 200px;
+    max-width: 250px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Célula do ISBN */
+.isbn-cell {
+    min-width: 120px;
+}
+
+.isbn-code {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #495057;
+    letter-spacing: 1px;
+}
+
+/* Célula de descrição */
+.descricao-cell {
+    min-width: 200px;
+    max-width: 250px;
+}
+
+.descricao-truncada {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #6c757d;
+    margin-bottom: 5px;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+.descricao-truncada:hover {
+    cursor: help;
+    position: relative;
+}
+
+.descricao-truncada:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: pre-wrap;
+    max-width: 300px;
+    z-index: 1000;
+    pointer-events: none;
+    margin-bottom: 5px;
+}
+
+.sem-descricao {
+    color: #adb5bd;
+    font-style: italic;
+    font-size: 13px;
+}
+
+.ver-mais-btn {
+    background: none;
+    border: none;
+    color: #019c99;
+    font-size: 12px;
+    padding: 2px 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.ver-mais-btn:hover {
+    color: #017a78;
+    text-decoration: underline;
+}
+
+/* Tags para autores e categorias */
+.autores-cell,
+.categorias-cell {
+    min-width: 150px;
+    max-width: 200px;
+}
+
+.autor-tag,
+.categoria-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #01579b;
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 500;
+    margin: 3px 2px;
+    border: 1px solid #90caf9;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 4px rgba(144, 202, 249, 0.2);
+}
+
+.categoria-tag {
+    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+    color: #7b1fa2;
+    border-color: #ce93d8;
+}
+
+/* Células de quantidade */
+.quantidade-cell,
+.disponivel-cell {
+    text-align: center;
+    font-weight: 600;
+    min-width: 80px;
+}
+
+.quantidade-disponivel {
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.quantidade-disponivel.indisponivel {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
 /* ========== BADGES DE STATUS ========== */
 .status-badge {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 3px 10px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
 }
 
-/* Cores para diferentes status */
-.status-ativo {
+.status-ativo,
+.status-disponível {
     background-color: #d1fae5;
     color: #065f46;
     border: 1px solid #a7f3d0;
 }
 
-.status-inativo {
+.status-inativo,
+.status-indisponível {
     background-color: #fee2e2;
     color: #991b1b;
     border: 1px solid #fecaca;
@@ -214,54 +391,13 @@
 /* Mensagem de tabela vazia */
 .empty-message {
     text-align: center;
-    padding: 40px 20px;
-    color: #666;
+    padding: 60px 20px;
+    color: #64748b;
     font-style: italic;
-    background: #fafafa;
-}
-
-/* ========== SELECT2 CUSTOMIZAÇÃO ========== */
-.select2-container--default .select2-selection--multiple {
-    border: 1px solid #ddd !important;
-    border-radius: 6px !important;
-    min-height: 44px !important;
-    padding: 3px !important;
-}
-
-.select2-container--default .select2-selection--multiple:focus {
-    border-color: #019c99 !important;
-    box-shadow: 0 0 0 3px rgba(1, 156, 153, 0.1) !important;
-}
-
-.select2-container--default.select2-container--focus .select2-selection--multiple {
-    border-color: #019c99 !important;
-}
-
-.select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: #e3f2fd !important;
-    border: 1px solid #019c99 !important;
-    border-radius: 4px !important;
-    color: #019c99 !important;
-    font-size: 12px !important;
-}
-
-.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-    color: #019c99 !important;
-    margin-right: 5px !important;
-}
-
-.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
-    color: #017a78 !important;
-}
-
-/* Ajuste para Select2 dentro do modal */
-.select2-container {
-    z-index: 10000 !important;
-}
-
-/* Garantir que o Select2 ocupe toda a largura do campo */
-.campo.select2-container {
-    width: 100% !important;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    font-size: 16px;
+    border-radius: 12px;
+    margin: 20px 0;
 }
 
 /* ========== MODAIS ========== */
@@ -271,14 +407,15 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 999;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
 }
 
 .modal:not(.hidden) {
@@ -286,19 +423,18 @@
     visibility: visible;
 }
 
-/* Conteúdo do modal */
 .modal-content {
     background: white;
     width: 100%;
-    max-width: 900px;
+    max-width: 850px;
     max-height: 90vh;
     overflow-y: auto;
-    border-radius: 12px;
-    padding: 30px;
+    border-radius: 16px;
+    padding: 0;
     position: relative;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    transform: translateY(-20px);
-    transition: transform 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 1000;
 }
 
@@ -306,45 +442,66 @@
     transform: translateY(0);
 }
 
-/* Botão de fechar modal */
-.close-modal {
-    position: absolute;
-    top: 20px;
-    right: 25px;
+/* Cabeçalho do modal */
+.modal-header {
+    background: linear-gradient(135deg, #019c99, #017a78);
+    color: white;
+    padding: 25px 30px;
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.modal-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-icon {
     font-size: 28px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.close-modal {
+    font-size: 32px;
+    color: rgba(255,255,255,0.9);
     cursor: pointer;
-    color: #666;
-    transition: all 0.2s ease;
-    width: 30px;
-    height: 30px;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: none;
-    border: none;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
 }
 
 .close-modal:hover {
-    color: #333;
-    background-color: #f5f5f5;
+    color: white;
+    background: rgba(255,255,255,0.2);
+    transform: rotate(90deg);
+    border-color: rgba(255,255,255,0.3);
 }
 
-/* Título do modal */
-.modal-content h3 {
-    color: #019c99;
-    margin-bottom: 25px;
-    font-size: 22px;
-    font-weight: 600;
-    text-align: center;
+/* Corpo do modal */
+.modal-content form {
+    padding: 30px;
 }
 
 /* ========== FORMULÁRIO DE EDIÇÃO ========== */
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-    margin: 20px 0 30px 0;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin: 0 0 25px 0;
 }
 
 .campo {
@@ -355,100 +512,302 @@
 .campo label {
     font-size: 14px;
     font-weight: 600;
-    color: #333;
+    color: #2c3e50;
     margin-bottom: 8px;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.label-icon {
+    font-size: 16px;
+    opacity: 0.8;
 }
 
 .campo input,
 .campo select,
-.select2-container .select2-selection {
+.campo textarea {
     width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    padding: 14px 16px;
+    border: 2px solid #e1e8ed;
+    border-radius: 10px;
     outline: none;
-    font-size: 14px;
-    color: #333;
-    background-color: white;
+    font-size: 15px;
+    color: #2c3e50;
+    background-color: #f8fafc;
     transition: all 0.3s ease;
-    min-height: 46px;
+    min-height: 50px;
     line-height: 1.5;
 }
 
-/* Foco consistente */
+.campo textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: 'Lexend', sans-serif;
+    line-height: 1.6;
+}
+
 .campo input:focus,
 .campo select:focus,
-.select2-container--default.select2-container--focus .select2-selection {
-    border-color: #019c99 !important;
-    box-shadow: 0 0 0 3px rgba(1, 156, 153, 0.1) !important;
+.campo textarea:focus {
+    border-color: #019c99;
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(1, 156, 153, 0.15);
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+    color: #94a3b8;
+    opacity: 0.7;
 }
 
 .campo select {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23718eb0' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 12px;
-    padding-right: 40px;
+    background-position: right 16px center;
+    background-size: 14px;
+    padding-right: 50px;
+}
+
+.field-hint {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 6px;
+    font-style: italic;
+}
+
+.campo.full-width {
+    grid-column: 1 / -1;
+}
+
+.section-header {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+/* ========== SELECT2 CUSTOMIZAÇÃO ========== */
+.select2-container {
+    width: 100% !important;
+    z-index: 10000 !important;
+}
+
+/* Container do Select2 */
+.select2-container--default .select2-selection--multiple {
+    background-color: #f8fafc;
+    border: 2px solid #e1e8ed !important;
+    border-radius: 10px !important;
+    min-height: 50px !important;
+    padding: 10px 14px !important;
+    transition: all 0.3s ease !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: #019c99 !important;
+    background-color: white !important;
+    box-shadow: 0 0 0 4px rgba(1, 156, 153, 0.15) !important;
+}
+
+/* Itens selecionados - Tags bonitas */
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 0 !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb) !important;
+    border: 2px solid #019c99 !important;
+    border-radius: 20px !important;
+    color: #01579b !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 6px 12px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    box-shadow: 0 2px 4px rgba(1, 156, 153, 0.1) !important;
+    transition: all 0.2s ease !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(1, 156, 153, 0.15) !important;
+}
+
+/* Botão de remover tag */
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: #019c99 !important;
+    margin-right: 0 !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    padding: 0 !important;
+    width: 18px;
+    height: 18px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50%;
+    transition: all 0.2s ease !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: white !important;
+    background-color: #019c99 !important;
+    transform: scale(1.1);
+}
+
+/* Campo de busca dentro do Select2 */
+.select2-container--default .select2-selection--multiple .select2-search__field {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 28px !important;
+    min-width: 120px !important;
+    color: #2c3e50 !important;
+    font-size: 15px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-search__field::placeholder {
+    color: #94a3b8 !important;
+    opacity: 0.7;
+}
+
+/* Dropdown do Select2 */
+.select2-container--default .select2-dropdown {
+    border: 2px solid #e1e8ed !important;
+    border-radius: 10px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    margin-top: 5px !important;
+    overflow: hidden;
+}
+
+.select2-container--default .select2-results__option {
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    color: #2c3e50;
+    transition: all 0.2s ease !important;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.select2-container--default .select2-results__option:last-child {
+    border-bottom: none;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb) !important;
+    color: #01579b !important;
+    font-weight: 500;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background: linear-gradient(135deg, #019c99, #017a78) !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+/* Select2 Simples (Single) */
+.select2-container--default .select2-selection--single {
+    background-color: #f8fafc !important;
+    border: 2px solid #e1e8ed !important;
+    border-radius: 10px !important;
+    height: 50px !important;
+    padding: 12px 16px !important;
+    transition: all 0.3s ease !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #2c3e50 !important;
+    line-height: 26px !important;
+    font-size: 15px !important;
+    padding-left: 0 !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 46px !important;
+    right: 12px !important;
+    width: 30px !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #019c99 !important;
+    background-color: white !important;
+    box-shadow: 0 0 0 4px rgba(1, 156, 153, 0.15) !important;
 }
 
 /* ========== ESTILOS PARA O CAMPO DE CAPA ========== */
-
-/* Container da capa */
-.campo.full-width {
-    grid-column: 1 / -1;
-    margin-top: 10px;
-}
-
 .capa-container {
     display: flex;
     gap: 30px;
-    margin-top: 10px;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #eee;
-    align-items: center;
+    margin-top: 15px;
+    padding: 25px;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 12px;
+    border: 2px solid #e1e8ed;
+    align-items: flex-start;
 }
 
-/* Preview da capa */
 .capa-preview {
-    width: 120px;
-    height: 160px;
-    border: 2px dashed #ddd;
-    border-radius: 8px;
+    width: 140px;
+    height: 190px;
+    border: 3px dashed #cbd5e1;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background: #f8f9fa;
+    background: white;
     flex-shrink: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.capa-preview:hover {
+    border-color: #019c99;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
 .capa-preview img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 10px;
 }
 
 .capa-placeholder {
     text-align: center;
-    color: #999;
-    font-size: 12px;
-    padding: 10px;
+    color: #94a3b8;
+    font-size: 13px;
+    padding: 15px;
 }
 
 .capa-placeholder span {
-    font-size: 30px;
+    font-size: 40px;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    opacity: 0.6;
 }
 
-/* Input de arquivo customizado */
-.file-input-container {
+.capa-controls {
     flex: 1;
+}
+
+.file-upload-area {
+    margin-bottom: 20px;
 }
 
 .file-input {
@@ -456,108 +815,250 @@
 }
 
 .file-input-label {
-    display: inline-block;
-    padding: 12px 24px;
-    background: #019c99;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #019c99, #017a78);
     color: white;
-    border-radius: 6px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     text-align: center;
     width: 100%;
     border: none;
+    box-shadow: 0 4px 12px rgba(1, 156, 153, 0.2);
 }
 
 .file-input-label:hover {
-    background: #017a78;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(1, 156, 153, 0.2);
+    box-shadow: 0 8px 20px rgba(1, 156, 153, 0.3);
+}
+
+.upload-icon {
+    font-size: 18px;
 }
 
 .file-help {
     display: block;
-    color: #666;
-    font-size: 12px;
-    margin-top: 5px;
-    line-height: 1.4;
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 8px;
+    line-height: 1.5;
 }
 
-/* Checkbox para remover capa */
 .remove-capa-container {
-    margin-top: 15px;
-    padding: 12px 15px;
-    background: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: 6px;
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border: 2px solid #ffd54f;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .remove-capa-container input[type="checkbox"] {
-    margin-right: 8px;
-    transform: scale(1.1);
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: #f59e0b;
+    cursor: pointer;
 }
 
 .remove-capa-container label {
-    color: #856404;
+    color: #92400e;
     font-size: 14px;
     cursor: pointer;
-    font-weight: 500;
-    text-align: center;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.remove-icon {
+    font-size: 16px;
 }
 
 /* ========== BOTÕES ========== */
 .btn-area {
-    margin-top: 40px;
+    margin-top: 30px;
     display: flex;
     justify-content: flex-end;
-    gap: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+    gap: 15px;
+    padding-top: 25px;
+    border-top: 2px solid #f1f5f9;
 }
 
 .btn-salvar,
-.btn-cancelar,
-.btn-confirmar-exclusao {
-    padding: 12px 30px;
-    border-radius: 6px;
-    font-size: 15px;
+.btn-cancelar {
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
-    min-width: 150px;
+    min-width: 160px;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
-/* Botão primário (salvar) */
 .btn-salvar {
-    background: #019c99;
+    background: linear-gradient(135deg, #019c99, #017a78);
     color: white;
+    box-shadow: 0 4px 15px rgba(1, 156, 153, 0.3);
 }
 
 .btn-salvar:hover {
-    background: #017a78;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(1, 156, 153, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(1, 156, 153, 0.4);
 }
 
-/* Botão secundário (cancelar) */
+.btn-salvar:active {
+    transform: translateY(-1px);
+}
+
 .btn-cancelar {
-    background: #f5f5f5;
-    color: #666;
-    border: 1px solid #ddd;
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    color: #475569;
+    border: 2px solid #cbd5e1;
 }
 
 .btn-cancelar:hover {
-    background: #e0e0e0;
-    color: #333;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+    color: #334155;
+    border-color: #94a3b8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(148, 163, 184, 0.2);
 }
 
-/* ========== ESTILOS PARA O MODAL DE EMPRÉSTIMO ========== */
+.btn-icon {
+    font-size: 18px;
+}
 
-/* Info do livro no modal */
+/* ========== MODAL DE DESCRIÇÃO COMPLETA ========== */
+.descricao-completa {
+    background: #f8fafc;
+    border: 2px solid #e1e8ed;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 20px 0;
+    max-height: 400px;
+    overflow-y: auto;
+    line-height: 1.8;
+    color: #334155;
+    font-size: 15px;
+    white-space: pre-wrap;
+}
+
+.descricao-modal .modal-content {
+    max-width: 600px;
+}
+
+/* ========== ANIMAÇÕES ========== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-content form > * {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.modal-content form > *:nth-child(1) { animation-delay: 0.1s; }
+.modal-content form > *:nth-child(2) { animation-delay: 0.2s; }
+.modal-content form > *:nth-child(3) { animation-delay: 0.3s; }
+.modal-content form > *:nth-child(4) { animation-delay: 0.4s; }
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 1600px) {
+    .livros-container {
+        padding: 20px;
+    }
+    
+    .card-tabela {
+        padding: 15px;
+        overflow-x: auto;
+    }
+    
+    .tabela-livros {
+        font-size: 13px;
+        min-width: 1300px;
+    }
+    
+    .tabela-livros thead th {
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+    
+    .tabela-livros tbody td {
+        padding: 10px 8px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .modal-content {
+        max-width: 95%;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .capa-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .capa-preview {
+        width: 100%;
+        max-width: 200px;
+        height: 250px;
+    }
+    
+    .btn-area {
+        flex-direction: column;
+    }
+    
+    .btn-salvar,
+    .btn-cancelar {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-header {
+        padding: 20px;
+    }
+    
+    .modal-header h3 {
+        font-size: 20px;
+    }
+    
+    .modal-content form {
+        padding: 20px;
+    }
+    
+    .modal-content {
+        max-height: 85vh;
+    }
+}
+
+/* ========== ESTILOS ESPECÍFICOS DO MODAL DE EMPRÉSTIMO ========== */
+#emprestar-modal .modal-content {
+    max-width: 700px;
+}
+
 .info-livro {
     background: #f0f9ff;
     border-radius: 8px;
@@ -578,20 +1079,6 @@
     margin: 5px 0;
 }
 
-.quantidade-disponivel {
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 4px;
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.quantidade-disponivel.indisponivel {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-/* Busca de alunos */
 .busca-aluno-container {
     display: flex;
     gap: 10px;
@@ -620,7 +1107,6 @@
     transform: translateY(-2px);
 }
 
-/* Resultados da busca */
 .resultados-busca {
     background: #f8f9fa;
     border: 1px solid #dee2e6;
@@ -676,7 +1162,6 @@
     margin: 2px 0;
 }
 
-/* Card do aluno selecionado */
 .card-aluno {
     background: #d4edda;
     border: 1px solid #c3e6cb;
@@ -721,7 +1206,6 @@
     background: #e0a800;
 }
 
-/* Info da data */
 .info-data {
     display: block;
     color: #6c757d;
@@ -730,7 +1214,6 @@
     font-style: italic;
 }
 
-/* Resumo do empréstimo */
 .resumo-emprestimo {
     background: #fff3cd;
     border: 1px solid #ffeaa7;
@@ -765,7 +1248,6 @@
     font-weight: 600;
 }
 
-/* Botão de confirmar empréstimo */
 .btn-confirmar-emprestimo {
     background: #28a745 !important;
     color: white !important;
@@ -779,43 +1261,4 @@
     background: #6c757d !important;
     cursor: not-allowed;
     opacity: 0.6;
-}
-
-/* Botão emprestar na tabela */
-.emprestar-icon {
-    cursor: pointer;
-    font-size: 18px;
-    padding: 8px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: none;
-    border: 1px solid #28a745;
-    color: #28a745;
-}
-
-.emprestar-icon:hover {
-    background-color: #d4edda;
-    color: #155724;
-    border-color: #155724;
-    transform: scale(1.1);
-}
-
-.emprestar-icon.disabled {
-    background-color: #f8f9fa;
-    border-color: #6c757d;
-    color: #6c757d;
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-.emprestar-icon.disabled:hover {
-    background-color: #f8f9fa;
-    color: #6c757d;
-    border-color: #6c757d;
-    transform: none;
 }
